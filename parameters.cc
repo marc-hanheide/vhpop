@@ -16,6 +16,8 @@
  * $Id: parameters.cc,v 6.3 2003-12-05 23:16:43 lorens Exp $
  */
 #include "parameters.h"
+#include <strings.h>
+#include <limits.h>
 
 
 /* ====================================================================== */

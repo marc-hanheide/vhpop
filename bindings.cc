@@ -23,6 +23,7 @@
 #include "formulas.h"
 #include "types.h"
 #include "debug.h"
+#include <limits.h>
 #include <algorithm>
 #include <typeinfo>
 

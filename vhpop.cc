@@ -23,10 +23,17 @@
 #include "domains.h"
 #include "problems.h"
 #include "debug.h"
+#include <limits.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <cerrno>
 #include <sys/time.h>
+
+#include <ctime>
+#include <ratio>
+#include <chrono>
+
 #if HAVE_GETOPT_LONG
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE

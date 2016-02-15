@@ -21,6 +21,7 @@
 #include "domains.h"
 #include "expressions.h"
 #include "debug.h"
+#include <limits.h>
 #include <limits>
 
 /* ====================================================================== */
