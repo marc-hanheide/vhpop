@@ -22,4 +22,4 @@ vhpop_LDADD = @LIBOBJS@
 MAINTAINERCLEANFILES = pddl.cc tokens.cc
 EXTRA_DIST = getopt.c getopt1.c getopt.h ipc3-vhpop examples scripts
 
-YFLAGS = -d
+AM_YFLAGS = -d
