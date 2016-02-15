@@ -82,7 +82,7 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/config.h.in mkinstalldirs pddl.hh pddl.cc tokens.cc \
-	getopt1.c getopt.c depcomp ylwrap COPYING compile install-sh \
+	getopt.c getopt1.c depcomp ylwrap COPYING compile install-sh \
 	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
