@@ -25,7 +25,7 @@
 #ifndef TERMS_H
 #define TERMS_H
 
-#include <config.h>
+#include "config.h"
 #include "types.h"
 #include <iostream>
 #include <map>
@@ -63,6 +63,15 @@ private:
 struct Variable {
   /* Constructs a variable. */
   explicit Variable(int index) : index_(index) {}
+
+  /*copy constructor*/
+    Variable(const Variable& s)
+    {
+      if(&s != 0)
+      {
+          this->index_ = s.index_;
+      }
+    }
 
   /* Converts this variable to a term. */
   operator Term() const;

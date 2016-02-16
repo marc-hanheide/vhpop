@@ -21,7 +21,7 @@
 #ifndef BINDINGS_H
 #define BINDINGS_H
 
-#include <config.h>
+#include "config.h"
 #include "terms.h"
 #include "chain.h"
 #include <set>
@@ -284,6 +284,8 @@ struct Bindings {
   /* Prints the given term on the given stream. */
   void print_term(std::ostream& os, const Term& term, size_t step_id) const;
 
+  Bindings(const Bindings& s);
+
 private:
   /* Varsets representing the transitive closure of the bindings. */
   const Chain<Varset>* varsets_;
@@ -300,6 +302,8 @@ private:
   /* Constructs a binding collection. */
   Bindings(const Chain<Varset>* varsets, size_t high_step,
 	   const Chain<StepDomain>* step_domains);
+
+
 };
 
 

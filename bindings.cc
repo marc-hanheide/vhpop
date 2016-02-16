@@ -62,10 +62,29 @@ struct Varset {
 
   /* Constructs a varset. */
   Varset(const Varset& vs)
-    : constant_((vs.constant_ != 0) ? new Object(*vs.constant_) : 0),
-      cd_set_(vs.cd_set_), ncd_set_(vs.ncd_set_), type_(vs.type_) {
-    RCObject::ref(cd_set_);
-    RCObject::ref(ncd_set_);
+    : type_(vs.type_) {
+
+      if (vs.constant_ != 0)
+          this->constant_  = new Object(*vs.constant_);
+      else
+          this->constant_ = 0;
+
+      if(vs.cd_set_ != 0)
+      {
+          this->cd_set_ = new Chain<StepVariable>(*vs.cd_set_);
+          RCObject::ref(cd_set_);
+      }
+      else
+          this->cd_set_ = 0;
+
+      if(vs.ncd_set_ != 0)
+      {
+          this->ncd_set_ = new Chain<StepVariable>(*vs.ncd_set_);
+          RCObject::ref(ncd_set_);
+      }
+      else
+          this->ncd_set_ = 0;
+
   }
 
   /* Deletes this varset. */
@@ -701,6 +720,27 @@ Bindings::Bindings(const Chain<Varset>* varsets, size_t high_step,
   RCObject::ref(step_domains_);
 }
 
+/*copy constructor*/
+Bindings::Bindings(const Bindings& s)
+    :ref_count_(0), high_step_(s.high_step_)
+{
+    if(s.varsets_ !=0)
+    {
+       this->varsets_ = new Chain<Varset>(*s.varsets_);
+       RCObject::ref(varsets_);
+    }
+    else
+        this->varsets_ = 0;
+
+    if(s.step_domains_ !=0)
+    {
+        this->step_domains_ = new Chain<StepDomain>(*s.step_domains_);
+        RCObject::ref(step_domains_);
+    }
+    else
+        this->step_domains_ = 0;
+
+}
 
 /* Deletes this binding collection. */
 Bindings::~Bindings() {
@@ -799,7 +839,43 @@ bool Bindings::unify(BindingList& mgu, const Literal& l1, size_t id1,
 		     const Literal& l2, size_t id2) const {
   if (l1.id() > 0 && l2.id() > 0) {
     /* Both literals are fully instantiated. */
-    return &l1 == &l2;
+    bool bl = false;
+    /*original code
+    return (&l1 == &l2)*/
+
+    //TODO this is not the nicest way to do,
+    //try to avoid dynamic cast
+    const Atom* a1 = dynamic_cast<const Atom*>(&l1);
+    const Atom* a2 = dynamic_cast<const Atom*>(&l2);
+    if((a1 != NULL)&&(a2 != NULL)) //both atoms
+    {
+       Atom aa = *a1;
+       Atom bb = *a2;
+       if(aa==bb) //atoms comparion;
+           bl = true;
+       return bl;
+    }
+    else
+    {
+        const Negation* n1 = dynamic_cast<const Negation*>(&l1);
+        const Negation* n2 = dynamic_cast<const Negation*>(&l2);
+        if((n1 != NULL)&&(n2 != NULL)) //both negation
+        {
+            Negation aa = *n1;
+            Negation bb = *n2;
+
+            if(n1==n2) //atoms comparion;
+                bl = true;
+            return bl;
+        }
+        else
+        {
+            return false; //they are not same type
+        }
+
+    }
+
+
   } else if (typeid(l1) != typeid(l2)) {
     /* Not the same type of literal. */
     return false;

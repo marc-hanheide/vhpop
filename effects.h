@@ -21,7 +21,7 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#include <config.h>
+#include "config.h"
 #include "terms.h"
 #include <vector>
 
@@ -44,6 +44,15 @@ struct Effect {
 
   /* Constructs an effect. */
   Effect(const Literal& literal, EffectTime when);
+
+  Effect(const Effect& o);
+
+  Effect()
+  {
+      condition_ = 0;
+      link_condition_ = 0;
+      literal_ = 0;
+  }
 
   /* Deletes this effect. */
   ~Effect();

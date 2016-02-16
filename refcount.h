@@ -25,7 +25,7 @@
 #ifndef REFCOUNT_H
 #define REFCOUNT_H
 
-#include <config.h>
+#include "config.h"
 #ifdef DEBUG_MEMORY
 # include <iostream>
 # include <map>
@@ -39,7 +39,9 @@
 /*
  * An object with a reference counter.
  */
+
 struct RCObject {
+
 #ifdef DEBUG_MEMORY
   static void print_statistics(std::ostream& os);
 #endif
@@ -61,6 +63,7 @@ struct RCObject {
   /* Decreases the reference count for the given object and deletes it
      if the reference count becomes zero. */
   static void destructive_deref(const RCObject* o) {
+
     if (o != 0) {
       o->ref_count_--;
       if (o->ref_count_ == 0) {
@@ -78,7 +81,7 @@ struct RCObject {
 
 protected:
   /* Constructs an object with a reference counter. */
-  RCObject() : ref_count_(0) {
+  RCObject() : ref_count_(0){
 #ifdef DEBUG_MEMORY
     creation_count[typeid(*this).name()]++;
 #endif
@@ -91,6 +94,7 @@ protected:
 #endif
   }
 
+
 private:
 #ifdef DEBUG_MEMORY
   static std::map<std::string, size_t> creation_count;
@@ -98,6 +102,7 @@ private:
 #endif
 
   /* Reference counter. */
+
   mutable unsigned long ref_count_;
 };
 

@@ -21,7 +21,7 @@
 #ifndef ORDERINGS_H
 #define ORDERINGS_H
 
-#include <config.h>
+#include "config.h"
 #include "chain.h"
 #include "formulas.h"
 #include <map>
@@ -186,6 +186,11 @@ struct Orderings {
   virtual float makespan(const std::map<std::pair<size_t,
 			 StepTime::StepPoint>, float>& min_times) const = 0;
 
+  virtual const Orderings * clone () const =0 ;
+
+  virtual void print(std::ostream& os) const = 0;
+
+
 protected:
   /* Constructs an empty ordering collection. */
   Orderings();
@@ -194,7 +199,7 @@ protected:
   Orderings(const Orderings& o);
 
   /* Prints this object on the given stream. */
-  virtual void print(std::ostream& os) const = 0;
+
 
 private:
   /* Reference counter. */
@@ -262,6 +267,13 @@ struct BinaryOrderings : public Orderings {
   virtual float makespan(const std::map<std::pair<size_t,
 			 StepTime::StepPoint>, float>& min_times) const;
 
+
+
+  virtual const BinaryOrderings * clone () const;
+
+
+
+
 protected:
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os) const;
@@ -309,6 +321,7 @@ struct TemporalOrderings : public Orderings {
   /* Constructs an empty ordering collection. */
   TemporalOrderings();
 
+
   /* Deletes this ordering collection. */
   virtual ~TemporalOrderings();
 
@@ -338,6 +351,14 @@ struct TemporalOrderings : public Orderings {
   const TemporalOrderings* refine(size_t step_id,
 				  float min_start, float min_end) const;
 
+  /*Lenka addition*/
+  const TemporalOrderings*
+  refine(float min_start, float min_end, const Step& new_step) const;
+
+  /*Lenka addition*/
+  const TemporalOrderings*
+  refine(const Ordering& new_ordering, const Step& new_step) const;
+
   /* Returns the ordering collection with the given additions. */
   const TemporalOrderings* refine(float time, const Step& new_step) const;
 
@@ -359,9 +380,21 @@ struct TemporalOrderings : public Orderings {
   virtual float makespan(const std::map<std::pair<size_t,
 			 StepTime::StepPoint>, float>& min_times) const;
 
-protected:
+
+  virtual const TemporalOrderings * clone() const
+  {
+      return new TemporalOrderings(*this);
+  }
+
   /* Prints this opbject on the given stream. */
   virtual void print(std::ostream& os) const;
+
+  /* Constructs a copy of this ordering collection. */
+  TemporalOrderings(const TemporalOrderings& o);
+
+
+
+
 
 private:
   /* Matrix representing the minimal network for the ordering constraints. */
@@ -369,8 +402,6 @@ private:
   /* Steps that are linked to the goal. */
   const Chain<size_t>* goal_achievers_;
 
-  /* Constructs a copy of this ordering collection. */
-  TemporalOrderings(const TemporalOrderings& o);
 
   /* Returns the time node for the given step. */
   size_t time_node(size_t id, StepTime t) const {

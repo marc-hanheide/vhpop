@@ -21,10 +21,12 @@
 #ifndef PLANS_H
 #define PLANS_H
 
-#include <config.h>
+#include "config.h"
 #include "chain.h"
 #include "flaws.h"
+#include "link.h"
 #include "orderings.h"
+#include "actions.h"
 
 struct Parameters;
 struct BindingList;
@@ -40,54 +42,7 @@ struct ActionEffectMap;
 struct FlawSelectionOrder;
 
 
-/* ====================================================================== */
-/* Link */
 
-/*
- * Causal link.
- */
-struct Link {
-  /* Constructs a causal link. */
-  Link(size_t from_id, StepTime effect_time, const OpenCondition& open_cond);
-
-  /* Constructs a causal link. */
-  Link(const Link& l);
-
-  /* Deletes this causal link. */
-  ~Link();
-
-  /* Returns the id of step that link goes from. */
-  size_t from_id() const { return from_id_; }
-
-  /* Returns the time of effect satisfying link. */
-  StepTime effect_time() const { return effect_time_; }
-
-  /* Returns the id of step that link goes to. */
-  size_t to_id() const { return  to_id_; }
-
-  /* Returns the condition satisfied by link. */
-  const Literal& condition() const { return *condition_; }
-
-  /* Returns the time of the condition satisfied by this link. */
-  FormulaTime condition_time() const { return condition_time_; }
-
-private:
-  /* Id of step that link goes from. */
-  size_t from_id_;
-  /* Time of effect satisfying link. */
-  StepTime effect_time_;
-  /* Id of step that link goes to. */
-  size_t to_id_;
-  /* Condition satisfied by link. */
-  const Literal* condition_;
-  /* Time of condition satisfied by link. */
-  FormulaTime condition_time_;
-};
-
-/* Equality operator for links. */
-inline bool operator==(const Link& l1, const Link& l2) {
-  return &l1 == &l2;
-}
 
 
 /* ====================================================================== */
@@ -102,14 +57,29 @@ struct Step {
     : id_(id), action_(&action) {}
 
   /* Constructs a step. */
+  /*Step(const Step& s)
+    : id_(s.id_), action_(s.action_) {}*/ // Lenka commented out
+
+  /*replaycing constructor step*/
   Step(const Step& s)
-    : id_(s.id_), action_(s.action_) {}
+    :id_(s.id_)
+  {
+      if(s.action_ != 0)
+      {
+          this->action_ = s.action_->clone();
+      }
+      else
+          this->action_ = 0;
+  }
+
 
   /* Returns the step id. */
   size_t id() const { return id_; }
 
   /* Returns the action that this step is instantiated from. */
   const Action& action() const { return *action_; }
+
+
 
 private:
   /* Step id. */
@@ -132,6 +102,15 @@ struct Plan {
   /* Returns plan for given problem. */
   static const Plan* plan(const Problem& problem, const Parameters& params,
 			  bool last_problem);
+
+  /* Copy constructor */
+  Plan(const Plan &cSource);
+
+
+  /*empty constructor*/
+  Plan();
+
+
 
   /* Cleans up after planning. */
   static void cleanup();
@@ -157,6 +136,9 @@ struct Plan {
   /* Returns the bindings of this plan. */
   const Bindings* bindings() const;
 
+  /* Returns the bindings of this plan anytime - Lenka method. */
+  const Bindings* bindings_anytime() const;
+
   /* Returns the potentially threatened links of this plan. */
   const Chain<Unsafe>* unsafes() const { return unsafes_; }
 
@@ -181,6 +163,9 @@ struct Plan {
 
   /* Returns the serial number of this plan. */
   size_t serial_no() const;
+
+  /*returns sum of maximal durations of actions*/
+  float duration() const;
 
 #ifdef DEBUG
   /* Returns the depth of this plan. */
@@ -218,6 +203,11 @@ struct Plan {
   bool reusable_steps(int& refinements, const Literal& literal,
 		      const OpenCondition& open_cond, int limit) const;
 
+  //Lenka moved this as public method
+  /* Returns the initial plan representing the given problem, or NULL
+     if goals of problem are inconsistent. */
+  static const Plan* make_initial_plan(const Problem& problem);
+
 private:
   /* List of plans. */
   struct PlanList : public std::vector<const Plan*> {
@@ -254,9 +244,7 @@ private:
   size_t depth_;
 #endif
 
-  /* Returns the initial plan representing the given problem, or NULL
-     if goals of problem are inconsistent. */
-  static const Plan* make_initial_plan(const Problem& problem);
+
 
   /* Constructs a plan. */
   Plan(const Chain<Step>* steps, size_t num_steps,

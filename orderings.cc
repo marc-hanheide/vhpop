@@ -24,6 +24,8 @@
 #include <limits.h>
 #include <limits>
 
+
+
 /* ====================================================================== */
 /* StepTime */
 
@@ -250,7 +252,16 @@ BinaryOrderings::BinaryOrderings() {}
 
 /* Constructs a copy of this ordering collection. */
 BinaryOrderings::BinaryOrderings(const BinaryOrderings& o)
-  : Orderings(o), before_(o.before_) {
+  : Orderings(o)
+{
+
+  std::vector<const BoolVector*> b;
+  for (int i=0; i< o.before_.size();i++)
+  {
+      b.push_back(new BoolVector(*o.before_.at(i)));
+  }
+  this->before_ = b;
+
   size_t n = before_.size();
   for (size_t i = 0; i < n; i++) {
     BoolVector::register_use(before_[i]);
@@ -551,6 +562,11 @@ void BinaryOrderings::print(std::ostream& os) const {
   os << " }";
 }
 
+const BinaryOrderings * BinaryOrderings::clone () const
+{
+    return new BinaryOrderings(*this);
+}
+
 
 /* ====================================================================== */
 /* TemporalOrderings */
@@ -562,7 +578,21 @@ TemporalOrderings::TemporalOrderings()
 
 /* Constructs a copy of this ordering collection. */
 TemporalOrderings::TemporalOrderings(const TemporalOrderings& o)
-  : Orderings(o), distance_(o.distance_), goal_achievers_(o.goal_achievers_) {
+  : Orderings(o), goal_achievers_(o.goal_achievers_) {
+
+
+    std::vector<const IntVector*> d;
+    for (int i=0; i< o.distance_.size();i++)
+    {
+        d.push_back(new IntVector(*o.distance_.at(i)));
+    }
+    this->distance_ = d;
+
+    if(o.goal_achievers_ !=0)
+        this->goal_achievers_ = new Chain<size_t>(*o.goal_achievers_);
+    else
+        this->goal_achievers_ = 0;
+
   size_t n = distance_.size();
   for (size_t i = 0; i < n; i++) {
     IntVector::register_use(distance_[i]);
@@ -697,6 +727,142 @@ const TemporalOrderings* TemporalOrderings::refine(size_t step_id,
   }
 }
 
+/*Lenka added*/
+/* Returns the ordering collection with the given additions. */
+const TemporalOrderings*
+TemporalOrderings::refine(float min_start, float min_end, const Step& new_step) const {
+  if (new_step.id() != 0 && new_step.id() != Plan::GOAL_ID
+      && new_step.id() > distance_.size()/2) {
+    int start = int(min_start/threshold + 0.5);
+    TemporalOrderings& orderings = *new TemporalOrderings(*this);
+    IntVector* fv = new IntVector(4*new_step.id() - 2, INT_MAX);
+    /* Time for start of new step. */
+    (*fv)[0] = start;
+    (*fv)[4*new_step.id() - 3] = -start;
+    for (size_t id = 1; id < new_step.id(); id++) {
+      int t = start - (*distance_[2*id - 1])[0];
+      (*fv)[2*id - 1] = (*fv)[2*id] = t;
+      (*fv)[4*new_step.id() - 2*id - 2] = -t;
+      (*fv)[4*new_step.id() - 2*id - 3] = -t;
+    }
+    orderings.distance_.push_back(fv);
+    IntVector::register_use(fv);
+    fv = new IntVector(4*new_step.id(), INT_MAX);
+    /* Time for end of new step. */
+    int end = int(min_end/threshold +0.5);
+    (*fv)[0] = end;
+    (*fv)[4*new_step.id() - 1] = -end;
+    for (size_t id = 1; id < new_step.id(); id++) {
+      int t = end - (*distance_[2*id - 1])[0];
+      (*fv)[2*id - 1] = (*fv)[2*id] = t;
+      (*fv)[4*new_step.id() - 2*id] = -t;
+      (*fv)[4*new_step.id() - 2*id - 1] = -t;
+    }
+    (*fv)[2*new_step.id() - 1] = (*fv)[2*new_step.id()] = 0;
+    orderings.distance_.push_back(fv);
+    IntVector::register_use(fv);
+
+    size_t i = time_node(new_step.id(), StepTime::AT_START);
+    size_t j = time_node(new_step.id(), StepTime::AT_END);
+    std::map<size_t, IntVector*> own_data;
+    if (orderings.fill_transitive(own_data, 0, i, start)
+    && orderings.fill_transitive(own_data, 0, j, end)) {
+      return &orderings;
+    }
+  } else {
+    return this;
+  }
+}
+
+/*Lenka addition*/
+/* Returns the the ordering collection with the given additions. */
+const TemporalOrderings*
+TemporalOrderings::refine(const Ordering& new_ordering,
+              const Step& new_step) const {
+
+    std::ostream &os = std::cout;
+  if (new_step.id() != 0 && new_step.id() != Plan::GOAL_ID) {
+    TemporalOrderings& orderings = *new TemporalOrderings(*this);
+    std::map<size_t, IntVector*> own_data;
+    if (new_step.id() > distance_.size()/2) {
+      const Value* min_v =
+    dynamic_cast<const Value*>(&new_step.action().min_duration());
+      if (min_v == NULL) {
+    throw std::runtime_error("non-constant minimum duration");
+      }
+      const Value* max_v =
+    dynamic_cast<const Value*>(&new_step.action().max_duration());
+      if (max_v == NULL) {
+    throw std::runtime_error("non-constant maximum duration");
+      }
+      float start_time = threshold;
+      float end_time;
+
+
+       end_time = threshold + min_v->value();
+
+
+      IntVector* fv = new IntVector(4*new_step.id() - 2, INT_MAX);
+      /* Earliest time for start of new step. */
+      (*fv)[4*new_step.id() - 3] = -int(start_time/threshold + 0.5);
+      own_data.insert(std::make_pair(orderings.distance_.size(), fv));
+      orderings.distance_.push_back(fv);
+      IntVector::register_use(fv);
+      fv = new IntVector(4*new_step.id(), INT_MAX);
+      /* Earliest time for end of new step. */
+      (*fv)[4*new_step.id() - 1] = -int(end_time/threshold + 0.5);
+      if (max_v->value() != std::numeric_limits<float>::infinity()) {
+    (*fv)[2*new_step.id() - 1] = int(max_v->value()/threshold + 0.5);
+      }
+      (*fv)[2*new_step.id()] = -int(min_v->value()/threshold + 0.5);
+      own_data.insert(std::make_pair(orderings.distance_.size(), fv));
+      orderings.distance_.push_back(fv);
+      IntVector::register_use(fv);
+    }
+
+    std::cout<< "before adding the ordering\n";
+    dynamic_cast<TemporalOrderings*>(&orderings)->print(os);
+    std::cout << "\n";
+    if (new_ordering.before_id() != 0)
+    {
+      if (new_ordering.after_id() != Plan::GOAL_ID)
+      {
+           size_t i = time_node(new_ordering.before_id(),
+           new_ordering.before_time());
+           size_t j = time_node(new_ordering.after_id(),
+           new_ordering.after_time());
+           int dist;
+           if (new_ordering.before_time().rel < new_ordering.after_time().rel)
+           {
+             dist = 0;
+           }
+           else
+           {
+             dist = 1;
+           }
+           if (orderings.fill_transitive(own_data, i, j, dist))
+           {
+
+             return &orderings;
+           }
+           else
+           {
+               delete &orderings;
+               return NULL;
+           }
+      }
+      else {
+         orderings.goal_achievers_ = new Chain<size_t>(new_ordering.before_id(),   orderings.goal_achievers_);
+         RCObject::ref(orderings.goal_achievers_);
+      }
+    }
+
+    return &orderings;
+  } else {
+
+    return this;
+  }
+}
 
 /* Returns the ordering collection with the given additions. */
 const TemporalOrderings*
@@ -789,20 +955,26 @@ TemporalOrderings::refine(const Ordering& new_ordering,
       }
       float start_time = threshold;
       float end_time;
-      if (pg != NULL) {
-	HeuristicValue h, hs;
-	new_step.action().condition().heuristic_value(h, hs, *pg,
+      if (pg != NULL)
+      {
+        HeuristicValue h, hs;
+        new_step.action().condition().heuristic_value(h, hs, *pg,
 						      new_step.id(), bindings);
-	if (hs.makespan() > start_time) {
-	  start_time = hs.makespan();
-	}
-	end_time = start_time + min_v->value();
-	if (h.makespan() > end_time) {
-	  end_time = h.makespan();
-	}
-      } else {
-	end_time = threshold + min_v->value();
-      }
+       if (hs.makespan() > start_time)
+       {
+          start_time = hs.makespan();
+       }
+       end_time = start_time + min_v->value();
+       if (h.makespan() > end_time)
+       {
+          end_time = h.makespan();
+       }
+     }
+     else
+     {
+       end_time = threshold + min_v->value();
+     }
+
       IntVector* fv = new IntVector(4*new_step.id() - 2, INT_MAX);
       /* Earliest time for start of new step. */
       (*fv)[4*new_step.id() - 3] = -int(start_time/threshold + 0.5);
@@ -820,29 +992,40 @@ TemporalOrderings::refine(const Ordering& new_ordering,
       orderings.distance_.push_back(fv);
       IntVector::register_use(fv);
     }
-    if (new_ordering.before_id() != 0) {
-      if (new_ordering.after_id() != Plan::GOAL_ID) {
-	size_t i = time_node(new_ordering.before_id(),
-			     new_ordering.before_time());
-	size_t j = time_node(new_ordering.after_id(),
-			     new_ordering.after_time());
-	int dist;
-	if (new_ordering.before_time().rel < new_ordering.after_time().rel) {
-	  dist = 0;
-	} else {
-	  dist = 1;
-	}
-	if (orderings.fill_transitive(own_data, i, j, dist)) {
-	  return &orderings;
-	} else {
-	  delete &orderings;
-	  return NULL;
-	}
-      } else {
-	orderings.goal_achievers_ =
-	  new Chain<size_t>(new_ordering.before_id(),
-			    orderings.goal_achievers_);
-	RCObject::ref(orderings.goal_achievers_);
+    if (new_ordering.before_id() != 0)
+    {
+      if (new_ordering.after_id() != Plan::GOAL_ID)
+      {
+           size_t i = time_node(new_ordering.before_id(),
+           new_ordering.before_time());
+           size_t j = time_node(new_ordering.after_id(),
+           new_ordering.after_time());
+           int dist;
+           if (new_ordering.before_time().rel < new_ordering.after_time().rel)
+           {
+             dist = 0;
+           }
+           else
+           {
+             dist = 1;
+           }
+           if (orderings.fill_transitive(own_data, i, j, dist))
+           {
+             //TemporalOrderings * to = dynamic_cast<TemporalOrderings *>(&orderings);
+             //to->print(os);
+             //std::cout<< "\n";
+             return &orderings;
+           }
+           else
+           {
+             //std::cout<<"NULL";
+             delete &orderings;
+             return NULL;
+           }
+      }
+      else {
+         orderings.goal_achievers_ = new Chain<size_t>(new_ordering.before_id(),   orderings.goal_achievers_);
+         RCObject::ref(orderings.goal_achievers_);
       }
     }
     return &orderings;
@@ -897,7 +1080,7 @@ int TemporalOrderings::distance(size_t t1, size_t t2) const {
   } else if (t1 < t2) {
     return (*distance_[t2 - 1])[t1];
   } else {
-    return (*distance_[t1 - 1])[2*t1 - 1 - t2];
+     return (*distance_[t1 - 1])[2*t1 - 1 - t2];
   }
 }
 
@@ -932,26 +1115,32 @@ void TemporalOrderings::set_distance(std::map<size_t, IntVector*>& own_data,
 bool
 TemporalOrderings::fill_transitive(std::map<size_t, IntVector*>& own_data,
 				   size_t i, size_t j, int dist) {
-  if (distance(j, i) > -dist) {
+  if (distance(j, i) > -dist)
+  {
     /*
      * Update the temporal constraints.
      *
      * Make sure that -d_ij <= d_ji always holds.
      */
     size_t n = distance_.size();
-    for (size_t k = 0; k <= n; k++) {
+    for (size_t k = 0; k <= n; k++)
+    {
       int d_ik = distance(i, k);
-      if (d_ik < INT_MAX && distance(j, k) > d_ik - dist) {
-	for (size_t l = 0; l <= n; l++) {
-	  int d_lj = distance(l, j);
-	  int new_d = d_ik + d_lj - dist;
-	  if (d_lj < INT_MAX && distance(l, k) > new_d) {
-	    set_distance(own_data, l, k, new_d);
-	    if (-distance(k, l) > new_d) {
-	      return false;
-	    }
-	  }
-	}
+      if (d_ik < INT_MAX && distance(j, k) > d_ik - dist)
+      {
+         for (size_t l = 0; l <= n; l++)
+         {
+            int d_lj = distance(l, j);
+            int new_d = d_ik + d_lj - dist;
+            if (d_lj < INT_MAX && distance(l, k) > new_d)
+            {
+               set_distance(own_data, l, k, new_d);
+               if (-distance(k, l) > new_d)
+               {
+                  return false;
+               }
+            }
+         }
       }
     }
   }
@@ -975,3 +1164,4 @@ void TemporalOrderings::print(std::ostream& os) const {
     }
   }
 }
+

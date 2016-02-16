@@ -21,7 +21,7 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
-#include <config.h>
+#include "config.h"
 #include "effects.h"
 
 struct Expression;
@@ -38,6 +38,9 @@ struct Bindings;
 struct Action {
   /* Deletes this action. */
   virtual ~Action();
+
+  virtual const Action * create () const = 0; // Virtual constructor (creation)
+  virtual const Action * clone () const = 0;
 
   /* Sets the condition for this action. */
   void set_condition(const Formula& condition);
@@ -82,6 +85,9 @@ struct Action {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const = 0;
 
+  /*copy constructor*/
+  Action(const Action& s);
+
 protected:
   /* Constructs an action with the given name. */
   Action(const std::string& name, bool durative);
@@ -104,6 +110,8 @@ private:
   const Expression* min_duration_;
   /* Maximum duration of this action. */
   const Expression* max_duration_;
+
+
 };
 
 /*
@@ -161,6 +169,18 @@ struct ActionSchema : public Action {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
 
+  ActionSchema(const ActionSchema& s);
+
+  const ActionSchema * create() const
+  {
+     return new ActionSchema("",false);
+  }
+
+  const ActionSchema * clone() const
+  {
+      return new ActionSchema(*this);
+  }
+
 private:
   /* Action schema parameters. */
   VariableList parameters_;
@@ -201,6 +221,8 @@ struct GroundAction : public Action {
   /* Constructs a ground action with the given name. */
   GroundAction(const std::string& name, bool durative);
 
+  GroundAction(const GroundAction& s);
+
   /* Adds an argument to this ground action. */
   void add_argument(Object arg);
 
@@ -210,6 +232,16 @@ struct GroundAction : public Action {
   /* Prints this action on the given stream with the given bindings. */
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
+
+  const GroundAction * create() const
+  {
+     return new GroundAction("",false);
+  }
+
+  const GroundAction * clone() const
+  {
+      return new GroundAction(*this);
+  }
 
 private:
   /* Action arguments. */

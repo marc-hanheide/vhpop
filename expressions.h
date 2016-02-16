@@ -25,7 +25,7 @@
 #ifndef EXPRESSIONS_H
 #define EXPRESSIONS_H
 
-#include <config.h>
+#include "config.h"
 #include "refcount.h"
 #include "functions.h"
 #include "terms.h"
@@ -49,6 +49,21 @@ struct Expression : public RCObject {
   /* Returns an instantiation of this expression. */
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const = 0;
+
+  /*copy formula*/
+  Expression(const Expression &s)
+   :RCObject(s)
+  {
+  }
+
+  Expression()
+    :RCObject()
+  {
+  }
+
+  virtual const Expression * clone () const = 0;
+
+  virtual float value() const = 0;
 
 protected:
   /* Prints this object on the given stream. */
@@ -80,6 +95,17 @@ struct Value : public Expression {
   /* Returns an instantiation of this expression. */
   virtual const Value& instantiation(const SubstitutionMap& subst,
 				     const ValueMap& values) const;
+
+  /*copy formula*/
+  Value(const Value &s)
+      :Expression(s), value_(s.value_)
+  {
+  }
+
+  const Value * clone () const
+  {
+     return new Value(*this);
+   }
 
 protected:
   /* Prints this object on the given stream. */
@@ -122,6 +148,21 @@ struct Fluent : public Expression {
   /* Returns an instantiation of this expression. */
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const;
+
+  //TODO maybe issue with not proper copying of fluents?
+  Fluent(const Fluent &s)
+      :Expression(s), id_(s.id_), function_(s.function_), terms_(s.terms_)
+  {
+      this->next_id = s.next_id;
+      this->fluents = s.fluents;
+  }
+
+  const Fluent * clone () const
+  {
+     return new Fluent(*this);
+   }
+
+  float value() const { return -1.0; }
 
 protected:
   /* Assigns an id to this fluent. */
@@ -192,6 +233,29 @@ struct Computation : public Expression {
   /* Returns the second operand for this computation. */
   const Expression& operand2() const { return *operand2_; }
 
+  Computation(const Computation &s)
+      :Expression(s)
+  {
+      if (s.operand1_ !=0)
+          this->operand1_ = s.operand1_->clone();
+      else
+          this->operand1_ = 0;
+
+      if(s.operand2_ != 0)
+          this->operand2_ = s.operand2_->clone();
+      else
+          this->operand2_ = 0;
+
+      ref(operand1_);
+      ref(operand2_);
+  }
+
+  virtual const Computation * clone () const
+  {
+   }
+
+  virtual float value() const {}
+
 protected:
   /* Constructs a computation. */
   Computation(const Expression& operand1, const Expression& operand2);
@@ -222,6 +286,18 @@ struct Addition : public Computation {
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const;
 
+  Addition(const Addition &s)
+      :Computation(s)
+  {
+  }
+
+  const Addition * clone () const
+  {
+     return new Addition(*this);
+   }
+
+   float value() const { return -1.0; }
+
 protected:
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os) const;
@@ -250,6 +326,18 @@ struct Subtraction : public Computation {
   /* Returns an instantiation of this expression. */
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const;
+
+
+  Subtraction(const Subtraction &s)
+      :Computation(s)
+  {
+  }
+
+  const Subtraction * clone () const
+  {
+     return new Subtraction(*this);
+   }
+
 
 protected:
   /* Prints this object on the given stream. */
@@ -280,6 +368,20 @@ struct Multiplication : public Computation {
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const;
 
+
+  Multiplication(const Multiplication &s)
+      :Computation(s)
+  {
+  }
+
+  const Multiplication * clone () const
+  {
+     return new Multiplication(*this);
+   }
+
+
+
+
 protected:
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os) const;
@@ -308,6 +410,16 @@ struct Division : public Computation {
   /* Returns an instantiation of this expression. */
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const;
+
+  Division(const Division &s)
+      :Computation(s)
+  {
+  }
+
+  const Division * clone () const
+  {
+     return new Division(*this);
+   }
 
 protected:
   /* Prints this object on the given stream. */
@@ -338,6 +450,18 @@ struct Minimum : public Computation {
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const;
 
+  Minimum(const Minimum &s)
+      :Computation(s)
+  {
+  }
+
+  const Minimum * clone () const
+  {
+     return new Minimum(*this);
+   }
+
+
+
 protected:
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os) const;
@@ -366,6 +490,19 @@ struct Maximum : public Computation {
   /* Returns an instantiation of this expression. */
   virtual const Expression& instantiation(const SubstitutionMap& subst,
 					  const ValueMap& values) const;
+
+
+  Maximum(const Maximum &s)
+      :Computation(s)
+  {
+  }
+
+  const Maximum * clone () const
+  {
+     return new Maximum(*this);
+   }
+
+
 
 protected:
   /* Prints this object on the given stream. */

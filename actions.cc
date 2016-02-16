@@ -41,6 +41,43 @@ Action::Action(const std::string& name, bool durative)
   RCObject::ref(max_duration_);
 }
 
+/*copy constructor*/
+Action::Action(const Action &s)
+    : id_(s.id_), name_(s.name_), durative_(s.durative_)
+{
+
+    //copy effects
+    this->effects_ = EffectList();//std::vector<const Effect *>();
+    for(int i=0; i< s.effects_.size();i++)
+    {
+       this->effects_.push_back(new Effect(*s.effects_.at(i)));
+    }
+    if (s.condition_ !=0)
+    {
+        this->condition_ = s.condition_->clone();
+        Formula::register_use(condition_);
+    }
+    else
+        this->condition_ = 0;
+
+    if (s.min_duration_ != 0)
+    {
+        this->min_duration_ = s.min_duration_->clone();
+        RCObject::ref(min_duration_);
+    }
+    else
+        this->min_duration_ = 0;
+
+    if (s.max_duration_ != 0)
+    {
+        this->max_duration_ = s.max_duration_->clone();
+        RCObject::ref(max_duration_);
+    }
+    else
+        this->max_duration_ = 0;
+
+}
+
 
 /* Deletes this action. */
 Action::~Action() {
@@ -160,6 +197,10 @@ void Action::strengthen_effects(const Domain& domain) {
 ActionSchema::ActionSchema(const std::string& name, bool durative)
   : Action(name, durative) {}
 
+
+/*copy constructor*/
+ActionSchema::ActionSchema(const ActionSchema& s)
+    : Action(s){}
 
 /* Adds a parameter to this action schema. */
 void ActionSchema::add_parameter(Variable var) {
@@ -329,6 +370,9 @@ void ActionSchema::print(std::ostream& os,
 GroundAction::GroundAction(const std::string& name, bool durative)
   : Action(name, durative) {}
 
+/*copy constructor*/
+GroundAction::GroundAction(const GroundAction &s)
+    : Action(s) {}
 
 /* Adds an argument to this ground action. */
 void GroundAction::add_argument(Object arg) {

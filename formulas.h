@@ -21,7 +21,7 @@
 #ifndef FORMULAS_H
 #define FORMULAS_H
 
-#include <config.h>
+#include "config.h"
 #include "predicates.h"
 #include "terms.h"
 #include <iostream>
@@ -108,6 +108,15 @@ struct Formula {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const = 0;
 
+  /*copy formula*/
+  Formula(const Formula &s) // ref_count set to zero because I am creating new object
+      :ref_count_(0)
+  {
+  }
+
+  //virtual const Formula * create () const = 0; // Virtual constructor (creation)
+  virtual const Formula * clone () const = 0;
+
 protected:
   /* Constructs a formula. */
   Formula();
@@ -174,11 +183,25 @@ struct Constant : public Formula {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
 
+   /*copy a constant*/
+   Constant(const Constant &s)
+     :Formula(s), value_(s.value_){}
+
+  const Constant * clone() const
+  {
+      return new Constant(*this);
+  }
+
+
+
 protected:
   /* Returns a negation of this formula. */
   virtual const Formula& negation() const;
 
 private:
+  /* Constructs a constant formula. */
+  explicit Constant(bool value);
+
   /* Constant representing true. */
   static const Constant TRUE_;
   /* Constant representing false. */
@@ -187,8 +210,7 @@ private:
   /* Value of this constant. */
   bool value_;
 
-  /* Constructs a constant formula. */
-  explicit Constant(bool value);
+  
 
   friend struct Formula;
 };
@@ -225,6 +247,21 @@ struct Literal : public Formula {
 
   /* Returns this formula subject to the given substitutions. */
   virtual const Literal& substitution(const SubstitutionMap& subst) const = 0;
+
+  Literal()
+      :Formula()
+  {
+  }
+
+  Literal(const Literal& s)
+   :Formula(s),id_(s.id_){}
+
+
+  virtual const Literal * clone() const
+  {
+  }
+
+
 
 protected:
   /* Assigns an id to this literal. */
@@ -297,6 +334,22 @@ struct Atom : public Literal {
   /* Prints this formula on the given stream with the given bindings. */
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
+
+
+  //TODO not sure what I should copy - maybe do something smarter about atoms
+  /*copy a constant*/
+  Atom(const Atom &s)
+   :Literal(s), predicate_(s.predicate_), terms_(s.terms_){
+      this->atoms = s.atoms;
+  }
+
+  const Atom * clone() const
+  {
+      return new Atom(*this);
+  }
+
+  friend bool operator== (Atom &l1, Atom &l2);
+
 
 protected:
   /* Returns the negation of this formula. */
@@ -384,6 +437,24 @@ struct Negation : public Literal {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
 
+  Negation(const Negation& s)
+    :Literal(s)
+  {
+     if(s.atom_ != 0)
+     {
+        this->atom_ = s.atom_->clone();
+     }
+     else
+        this->atom_ = 0;
+  }
+
+  const Negation * clone() const
+  {
+      return new Negation(*this);
+  }
+
+  friend bool operator== (Negation &l1, Negation &l2);
+
 protected:
   /* Returns the negation of this formula. */
   virtual const Literal& negation() const;
@@ -446,6 +517,14 @@ struct BindingLiteral : public Formula {
   virtual const Formula& separator(const Effect& effect,
 				   const Domain& domain) const;
 
+  BindingLiteral(const BindingLiteral& s)
+    :Formula(s), variable_(s.variable_), id1_(s.id1_), term_(s.term_), id2_(s.id2_)
+  { }
+
+  virtual const BindingLiteral * clone() const
+  {
+  }
+
 protected:
   /* Constructs a binding literal. */
   BindingLiteral(const Variable& variable, size_t id1,
@@ -498,6 +577,15 @@ struct Equality : public BindingLiteral {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
 
+  Equality(const Equality& s)
+    :BindingLiteral(s)
+  {}
+
+  const Equality * clone() const
+  {
+      return new Equality(*this);
+  }
+
 protected:
   /* Returns the negation of this formula. */
   virtual const Formula& negation() const;
@@ -542,6 +630,15 @@ struct Inequality : public BindingLiteral {
   /* Prints this formula on the given stream with the given bindings. */
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
+
+  Inequality(const Inequality& s)
+    :BindingLiteral(s)
+  {}
+
+  const Inequality * clone() const
+  {
+      return new Inequality(*this);
+  }
 
 protected:
   /* Returns the negation of this formula. */
@@ -599,6 +696,15 @@ struct Conjunction : public Formula {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
 
+  Conjunction(const Conjunction& s)
+    :Formula(s), conjuncts_(s.conjuncts_)
+  {}
+
+  const Conjunction * clone() const
+  {
+      return new Conjunction(*this);
+  }
+
 protected:
   /* Returns the negation of this formula. */
   virtual const Formula& negation() const;
@@ -653,6 +759,15 @@ struct Disjunction : public Formula {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
 
+  Disjunction(const Disjunction& s)
+    :Formula(s), disjuncts_(s.disjuncts_)
+  {}
+
+  const Disjunction * clone() const
+  {
+      return new Disjunction(*this);
+  }
+
 protected:
   /* Returns the negation of this formula. */
   virtual const Formula& negation() const;
@@ -689,6 +804,22 @@ struct Quantification : public Formula {
      definitely asserted by this formula. */
   virtual const Formula& separator(const Effect& effect,
 				   const Domain& domain) const;
+
+
+  Quantification(const Quantification& s)
+    :Formula(s), parameters_(s.parameters_)
+  {
+    if(s.body_ !=0)
+    {
+       this->body_ = s.body_->clone();
+    }
+    else
+        this->body_ = 0;
+  }
+
+  virtual const Quantification * clone() const
+  {}
+
 
 protected:
   /* Constructs a quantified formula. */
@@ -732,6 +863,17 @@ struct Exists : public Quantification {
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
 
+
+  Exists(const Exists& s)
+    :Quantification(s)
+  {
+  }
+
+  const Exists * clone() const
+  {
+      return new Exists(*this);
+  }
+
 protected:
   /* Returns the negation of this formula. */
   virtual const Quantification& negation() const;
@@ -767,6 +909,22 @@ struct Forall : public Quantification {
   /* Prints this formula on the given stream with the given bindings. */
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
+
+  Forall(const Forall& s)
+    :Quantification(s)
+  {
+    if (s.universal_base_ != 0)
+    {
+       this->universal_base_ = s.universal_base_->clone();
+    }
+    else
+        this->universal_base_ = 0;
+  }
+
+  const Forall * clone() const
+  {
+      return new Forall(*this);
+  }
 
 protected:
   /* Returns the negation of this formula. */
@@ -830,6 +988,22 @@ struct TimedLiteral : public Formula {
   /* Prints this formula on the given stream with the given bindings. */
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;
+
+  TimedLiteral(const TimedLiteral& s)
+    :Formula(s), when_(s.when_)
+  {
+      if (s.literal_ != 0)
+      {
+          this->literal_ = s.literal_->clone();
+      }
+      else
+          this->literal_ = 0;
+  }
+
+  const TimedLiteral * clone() const
+  {
+      return new TimedLiteral(*this);
+  }
 
 protected:
   /* Returns the negation of this formula. */

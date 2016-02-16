@@ -27,12 +27,49 @@
 /* Effect */
 
 /* Constructs an effect. */
+/*Lenka fixes*/
 Effect::Effect(const Literal& literal, EffectTime when)
-  : condition_(&Formula::TRUE), link_condition_(&Formula::TRUE),
-    literal_(&literal), when_(when) {
+  : condition_(&Formula::TRUE), link_condition_(&Formula::TRUE), when_(when) {
+
+    //const Literal * lit = literal;
+    //if(lit != 0)
+        this->literal_ = literal.clone();
+    //else
+     //   this->literal_ = 0;
+
   Formula::register_use(condition_);
   Formula::register_use(link_condition_);
   Formula::register_use(literal_);
+}
+
+/*copy constructor*/
+Effect::Effect(const Effect &o)
+{
+
+    this->parameters_ = o.parameters_;
+
+    this->when_ = o.when_;
+
+    if(o.condition_ != 0)
+        this->condition_ = o.condition_->clone();
+    else
+        this->condition_ = 0;
+
+    if(o.link_condition_ !=0)
+        this->link_condition_ = o.link_condition_->clone();
+    else
+        this->link_condition_ = 0;
+
+    if(o.literal_ != 0)
+        this->literal_ = o.literal_->clone();
+    else
+        this->literal_ = 0;
+
+
+    Formula::register_use(condition_);
+    Formula::register_use(link_condition_);
+    Formula::register_use(literal_);
+
 }
 
 

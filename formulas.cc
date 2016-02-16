@@ -42,6 +42,8 @@ Formula::Formula()
 }
 
 
+
+
 /* Deletes this formula. */
 Formula::~Formula() {
 #ifdef DEBUG_MEMORY
@@ -226,6 +228,7 @@ void Literal::assign_id(bool ground) {
 }
 
 
+
 /* Returns a formula that separates the given effect from anything
    definitely asserted by this formula. */
 const Formula& Literal::separator(const Effect& effect,
@@ -261,6 +264,10 @@ const Formula& Literal::separator(const Effect& effect,
 
 /* ====================================================================== */
 /* Atom */
+
+
+
+
 
 /* Tests if the two atoms are unifiable, assuming the second atom is
    fully instantiated. */
@@ -453,6 +460,26 @@ const Literal& Atom::negation() const {
   return Negation::make(*this);
 }
 
+bool operator== (Atom &l1, Atom &l2)
+{
+   bool b = true; //TODO FIX
+
+   if(l1.predicate_ != l2.predicate_)
+   {
+       b = false;
+   }
+   if(l1.terms_ != l2.terms_)
+       b = false;
+   //TODO is it allright to skip comparison of atoms?
+   //this one is wrong
+   /*if(l1.atoms != l2.atoms)
+       b = false;*/
+   if(l1.id() != l2.id())
+       b=false;
+
+   return b;
+}
+
 
 /* ====================================================================== */
 /* Negation */
@@ -552,6 +579,16 @@ void Negation::print(std::ostream& os,
 /* Returns the negation of this formula. */
 const Literal& Negation::negation() const {
   return atom();
+}
+
+bool operator== (Negation &l1, Negation &l2)
+{
+   bool b = false;
+   //TODO is it allright to skip negations?
+   if(l1.atom_ == l2.atom_)
+       b = true;
+
+   return b;
 }
 
 

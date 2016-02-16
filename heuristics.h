@@ -21,7 +21,7 @@
 #ifndef HEURISTICS_H
 #define HEURISTICS_H
 
-#include <config.h>
+#include "config.h"
 #include "domains.h"
 #include "formulas.h"
 #include <stdexcept>

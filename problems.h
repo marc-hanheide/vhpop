@@ -21,7 +21,7 @@
 #ifndef PROBLEMS_H
 #define PROBLEMS_H
 
-#include <config.h>
+#include "config.h"
 #include "domains.h"
 #include "formulas.h"
 #include "expressions.h"
@@ -58,6 +58,8 @@ struct Problem {
 
   /* Returns the problem with the given name, or NULL if it is undefined. */
   static const Problem* find(const std::string& name);
+
+  static const Problem* find_l(const std::string& name);
 
   /* Removes all defined problems. */
   static void clear();

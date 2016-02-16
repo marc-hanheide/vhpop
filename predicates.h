@@ -25,7 +25,7 @@
 #ifndef PREDICATES_H
 #define PREDICATES_H
 
-#include <config.h>
+#include "config.h"
 #include "types.h"
 #include <iostream>
 #include <map>

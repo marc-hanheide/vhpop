@@ -19,6 +19,7 @@
 #include "plans.h"
 #include "domains.h"
 #include "formulas.h"
+#include "effects.h"
 
 
 /* ====================================================================== */
@@ -41,7 +42,13 @@ OpenCondition::OpenCondition(size_t step_id, const Literal& condition,
 
 /* Constructs an open condition. */
 OpenCondition::OpenCondition(const OpenCondition& oc)
-  : step_id_(oc.step_id_), condition_(oc.condition_), when_(oc.when_) {
+  : step_id_(oc.step_id_), when_(oc.when_) {
+
+    if(oc.condition_ != 0)
+        this->condition_ = oc.condition_->clone();
+    else
+        this->condition_ = 0;
+
   Formula::register_use(condition_);
 }
 
@@ -99,13 +106,53 @@ void Unsafe::print(std::ostream& os, const Bindings& bindings) const {
   os << ' ' << link().to_id() << " step " << step_id() << ">";
 }
 
+Unsafe::Unsafe(const Unsafe &o)
+    :step_id_(o.step_id_)
+{
+    if(o.link_ != 0)
+        this->link_ = new Link(*o.link_);
+    else
+        this->link_ = 0;
+
+
+    if(o.effect_ != 0)
+        this->effect_ = new Effect(*o.effect_);
+    else
+        this->effect_ = 0;
+}
+
 
 /* ====================================================================== */
 /* MutexThreat */
 
+  /*Lenka fixixng the empty constructor*/
+  MutexThreat::MutexThreat()
+  {
+    this->step_id1_ = 0;
+    this->step_id2_ = 0;
+    this->effect1_ = new Effect();
+    this->effect2_ = new Effect();
+  }
+
+  MutexThreat::MutexThreat(const MutexThreat& o)
+     :step_id1_(o.step_id1_), step_id2_(o.step_id2_)
+  {
+      std::cout <<"in mutexthreat copy constructor\n";
+      if(o.effect1_ != 0)
+          this->effect1_ = new Effect(*o.effect1_);
+      else
+          this->effect1_ = 0;
+
+      if(o.effect2_ != 0)
+          this->effect2_ = new Effect(*o.effect2_);
+      else
+          this->effect2_ = 0;
+
+  }
+
 /* Prints this object on the given stream. */
 void MutexThreat::print(std::ostream& os, const Bindings& bindings) const {
-  os << "#<MUTEX " << step_id1() << ' ';
+  os << "#<MUTEX " << step_id1() << " ";
   effect1().literal().print(os, step_id1(), bindings);
   os << ' ' << step_id2() << ' ';
   effect2().literal().print(os, step_id2(), bindings);

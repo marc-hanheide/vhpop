@@ -21,7 +21,7 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-#include <config.h>
+#include "config.h"
 #include "heuristics.h"
 #include <stdexcept>
 #include <string>

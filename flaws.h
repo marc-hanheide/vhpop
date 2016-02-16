@@ -21,9 +21,10 @@
 #ifndef FLAWS_H
 #define FLAWS_H
 
-#include <config.h>
+#include "config.h"
 #include "formulas.h"
 #include "chain.h"
+
 #include <iostream>
 
 struct Domain;
@@ -40,6 +41,7 @@ struct Link;
 struct Flaw {
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os, const Bindings& bindings) const = 0;
+
 };
 
 
@@ -89,6 +91,8 @@ struct OpenCondition : public Flaw {
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os, const Bindings& bindings) const;
 
+
+
 private:
   /* Id of step to which this open condition belongs. */
   size_t step_id_;
@@ -115,6 +119,9 @@ struct Unsafe : public Flaw {
   Unsafe(const Link& link, size_t step_id, const Effect& effect)
     : link_(&link), step_id_(step_id), effect_(&effect) {}
 
+  Unsafe(const Unsafe& o);
+
+
   /* Returns the threatened link. */
   const Link& link() const { return *link_; }
 
@@ -126,6 +133,7 @@ struct Unsafe : public Flaw {
 
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os, const Bindings& bindings) const;
+
 
 private:
   /* Threatened link. */
@@ -150,13 +158,17 @@ inline bool operator==(const Unsafe& u1, const Unsafe& u2) {
  */
 struct MutexThreat : public Flaw {
   /* Constructs a mutex threat place hoder. */
-  MutexThreat() : step_id1_(0) {}
+  MutexThreat();
 
   /* Constructs a mutex threat. */
   MutexThreat(size_t step_id1, const Effect& effect1,
 	      size_t step_id2, const Effect& effect2)
     : step_id1_(step_id1), effect1_(&effect1),
       step_id2_(step_id2), effect2_(&effect2) {}
+
+/*copy constructor*/
+  MutexThreat(const MutexThreat& o);
+ 
 
   /* Returns the id for the first step. */
   size_t step_id1() const { return step_id1_; }
@@ -172,6 +184,8 @@ struct MutexThreat : public Flaw {
 
   /* Prints this object on the given stream. */
   virtual void print(std::ostream& os, const Bindings& bindings) const;
+
+
 
 private:
   /* The id for the first step. */

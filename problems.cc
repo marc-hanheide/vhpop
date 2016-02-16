@@ -56,6 +56,12 @@ const Problem* Problem::find(const std::string& name) {
 }
 
 
+/* Returns the problem with the given name, Lenka method */
+const Problem* Problem::find_l(const std::string& name) {
+  ProblemMap::const_iterator pi = problems.find(name);
+  return (*pi).second;
+}
+
 /* Removes all defined problems. */
 void Problem::clear() {
   ProblemMap::const_iterator pi = begin();
