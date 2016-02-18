@@ -1665,18 +1665,20 @@ const Quantification& Forall::negation() const {
 
 /* Returns a literal with the given time stamp. */
 const Formula& TimedLiteral::make(const Literal& literal, FormulaTime when) {
-  if (when == AT_START) {
-    return literal;
-  } else {
+  //Lenka comment this out, not sure why "AT_START" differs
+ // if (when == AT_START) {
+  //  return literal;
+  //} else {
     return *new TimedLiteral(literal, when);
-  }
+  //}
 }
 
 
 /* Constructs a timed literal. */
 TimedLiteral::TimedLiteral(const Literal& literal, FormulaTime when)
-  : literal_(&literal), when_(when) {
-  register_use(literal_);
+  :  when_(when) {
+     this->literal_ = literal.clone();
+      register_use(literal_);
 }
 
 
