@@ -1948,16 +1948,18 @@ int Plan::make_link(PlanList& plans, const Step& step, const Effect& effect,
   if (test_only) {
     new_bindings = unifier;
   } else {
-    for (BindingList::const_iterator si = unifier.begin();
-	 si != unifier.end(); si++) {
+    for (BindingList::const_iterator si = unifier.begin(); si != unifier.end(); si++)
+    {
       const Binding& subst = *si;
-      if (effect.quantifies(subst.var())) {
-	Variable v = TermTable::add_variable(TermTable::type(subst.var()));
-	forall_subst.insert(std::make_pair(subst.var(), v));
-	new_bindings.push_back(Binding(v, subst.var_id(),
-				       subst.term(), subst.term_id(), true));
-      } else {
-	new_bindings.push_back(subst);
+      if (effect.quantifies(subst.var()))
+      {
+         Variable v = TermTable::add_variable(TermTable::type(subst.var()));
+         forall_subst.insert(std::make_pair(subst.var(), v));
+         new_bindings.push_back(Binding(v, subst.var_id(), subst.term(), subst.term_id(), true));
+      }
+      else
+      {
+         new_bindings.push_back(subst);
       }
     }
   }

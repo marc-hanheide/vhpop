@@ -54,8 +54,30 @@ struct Varset {
   /* Constructs a varset. */
   Varset(const Object* constant, const Chain<StepVariable>* cd_set,
 	 const Chain<StepVariable>* ncd_set, const Type& type)
-    : constant_((constant != 0) ? new Object(*constant) : 0),
-      cd_set_(cd_set), ncd_set_(ncd_set), type_(type) {
+    : type_(type) {
+
+        if (constant != 0)
+            this->constant_  = new Object(*constant);
+        else
+            this->constant_ = 0;
+
+        if(cd_set != 0)
+        {
+            this->cd_set_ = new Chain<StepVariable>(*cd_set);
+            RCObject::ref(cd_set_);
+        }
+        else
+            this->cd_set_ = 0;
+
+        if(ncd_set != 0)
+        {
+            this->ncd_set_ = new Chain<StepVariable>(*ncd_set);
+            RCObject::ref(ncd_set_);
+        }
+        else
+            this->ncd_set_ = 0;
+
+
     RCObject::ref(cd_set_);
     RCObject::ref(ncd_set_);
   }
@@ -756,9 +778,7 @@ Bindings::~Bindings() {
      not bound to a single object. */
 Term Bindings::binding(const Term& term, size_t step_id) const {
   if (term.variable()) {
-    const Varset* vs =
-      ((step_id <= high_step_)
-       ? find_varset(varsets_, term.as_variable(), step_id) : 0);
+    const Varset* vs = ((step_id <= high_step_) ? find_varset(varsets_, term.as_variable(), step_id) : 0);
     if (vs != 0 && vs->constant() != 0) {
       return *vs->constant();
     }

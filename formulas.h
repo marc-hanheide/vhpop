@@ -341,6 +341,15 @@ struct Atom : public Literal {
   Atom(const Atom &s)
    :Literal(s), predicate_(s.predicate_), terms_(s.terms_){
       this->atoms = s.atoms;
+      //TODO copying of AtomTable leads to recursive call
+      /*std::set<const Atom*, AtomLess>::iterator it;
+      std::set<const Atom*, AtomLess> s_at;
+      for (it = atoms.begin(); it != atoms.end(); ++it)
+      {
+          this->atoms.insert(new Atom(**it));
+      }*/
+
+
   }
 
   const Atom * clone() const
