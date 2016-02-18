@@ -446,6 +446,7 @@ const Formula& Atom::universal_base(const SubstitutionMap& subst,
 void Atom::print(std::ostream& os,
 		 size_t step_id, const Bindings& bindings) const {
   os << '(' << predicate();
+  std::cout << predicate() << "\n";
   for (TermList::const_iterator ti = terms_.begin();
        ti != terms_.end(); ti++) {
     os << ' ';
