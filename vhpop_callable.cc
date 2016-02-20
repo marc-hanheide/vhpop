@@ -43,7 +43,7 @@ std::string current_file;
 /* Level of warnings. */
 int warning_level;
 /* Verbosity level. */
-int verbosity;
+int verbosity = 2;
 
 /* Default planning parameters. */
 Parameters params;
