@@ -788,8 +788,10 @@ Conjunction::~Conjunction() {
 
 /* Adds a conjunct to this conjunction. */
 void Conjunction::add_conjunct(const Formula& conjunct) {
-  conjuncts_.push_back(&conjunct);
-  register_use(&conjunct);
+   //lenka adding cloning
+   const Formula * f = conjunct.clone();
+   conjuncts_.push_back(f);
+  register_use(f);
 }
 
 
@@ -987,7 +989,8 @@ void Conjunction::print(std::ostream& os,
   for (FormulaList::const_iterator fi = conjuncts().begin();
        fi != conjuncts().end(); fi++) {
     os << ' ';
-    (*fi)->print(os, step_id, bindings);
+    const Formula * f = *fi;
+    f->print(os, step_id, bindings);
   }
   os << ")";
 }

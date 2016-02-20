@@ -706,8 +706,14 @@ struct Conjunction : public Formula {
 		     size_t step_id, const Bindings& bindings) const;
 
   Conjunction(const Conjunction& s)
-    :Formula(s), conjuncts_(s.conjuncts_)
-  {}
+    :Formula(s)
+  {
+
+      for (FormulaList::const_iterator fi = s.conjuncts_.begin();
+           fi != s.conjuncts_.end(); fi++) {
+          conjuncts_.push_back((*fi)->clone());
+      }
+  }
 
   const Conjunction * clone() const
   {
@@ -769,8 +775,14 @@ struct Disjunction : public Formula {
 		     size_t step_id, const Bindings& bindings) const;
 
   Disjunction(const Disjunction& s)
-    :Formula(s), disjuncts_(s.disjuncts_)
-  {}
+    :Formula(s)
+  {
+
+      for (FormulaList::const_iterator fi = s.disjuncts_.begin();
+           fi != s.disjuncts_.end(); fi++) {
+          disjuncts_.push_back((*fi)->clone());
+      }
+  }
 
   const Disjunction * clone() const
   {
@@ -1003,10 +1015,14 @@ struct TimedLiteral : public Formula {
   {
       if (s.literal_ != 0)
       {
+          const Literal * so;
           this->literal_ = s.literal_->clone();
       }
       else
           this->literal_ = 0;
+
+
+      register_use(literal_);
   }
 
   const TimedLiteral * clone() const
