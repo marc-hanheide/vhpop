@@ -788,10 +788,8 @@ Conjunction::~Conjunction() {
 
 /* Adds a conjunct to this conjunction. */
 void Conjunction::add_conjunct(const Formula& conjunct) {
-   //lenka adding cloning
-   const Formula * f = conjunct.clone();
-   conjuncts_.push_back(f);
-  register_use(f);
+  conjuncts_.push_back(&conjunct);
+  register_use(&conjunct);
 }
 
 
@@ -989,8 +987,7 @@ void Conjunction::print(std::ostream& os,
   for (FormulaList::const_iterator fi = conjuncts().begin();
        fi != conjuncts().end(); fi++) {
     os << ' ';
-    const Formula * f = *fi;
-    f->print(os, step_id, bindings);
+    (*fi)->print(os, step_id, bindings);
   }
   os << ")";
 }
@@ -1669,11 +1666,12 @@ const Quantification& Forall::negation() const {
 /* Returns a literal with the given time stamp. */
 const Formula& TimedLiteral::make(const Literal& literal, FormulaTime when) {
   //Lenka comment this out, not sure why "AT_START" differs
- // if (when == AT_START) {
-  //  return literal;
-  //} else {
+  if (when == AT_START) {
+    return *literal.clone();
+  }
+   else {
     return *new TimedLiteral(literal, when);
-  //}
+  }
 }
 
 
