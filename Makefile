@@ -76,13 +76,13 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = vhpop$(EXEEXT)
+bin_PROGRAMS = vhpop_callable_main$(EXEEXT)
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/config.h.in mkinstalldirs pddl.hh pddl.cc tokens.cc \
-	getopt.c getopt1.c depcomp ylwrap COPYING compile install-sh \
+	getopt1.c getopt.c depcomp ylwrap COPYING compile install-sh \
 	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -96,15 +96,17 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_vhpop_OBJECTS = vhpop.$(OBJEXT) refcount.$(OBJEXT) types.$(OBJEXT) \
-	terms.$(OBJEXT) predicates.$(OBJEXT) functions.$(OBJEXT) \
-	expressions.$(OBJEXT) formulas.$(OBJEXT) effects.$(OBJEXT) \
-	actions.$(OBJEXT) domains.$(OBJEXT) problems.$(OBJEXT) \
-	bindings.$(OBJEXT) orderings.$(OBJEXT) flaws.$(OBJEXT) \
-	heuristics.$(OBJEXT) plans.$(OBJEXT) parameters.$(OBJEXT) \
-	requirements.$(OBJEXT) pddl.$(OBJEXT) tokens.$(OBJEXT)
-vhpop_OBJECTS = $(am_vhpop_OBJECTS)
-vhpop_DEPENDENCIES = 
+am_vhpop_callable_main_OBJECTS = vhpop_callable_main.$(OBJEXT) \
+	refcount.$(OBJEXT) types.$(OBJEXT) terms.$(OBJEXT) \
+	predicates.$(OBJEXT) functions.$(OBJEXT) expressions.$(OBJEXT) \
+	formulas.$(OBJEXT) effects.$(OBJEXT) actions.$(OBJEXT) \
+	domains.$(OBJEXT) problems.$(OBJEXT) bindings.$(OBJEXT) \
+	orderings.$(OBJEXT) flaws.$(OBJEXT) heuristics.$(OBJEXT) \
+	plans.$(OBJEXT) parameters.$(OBJEXT) requirements.$(OBJEXT) \
+	pddl.$(OBJEXT) tokens.$(OBJEXT) link.$(OBJEXT) \
+	vhpop_callable.$(OBJEXT)
+vhpop_callable_main_OBJECTS = $(am_vhpop_callable_main_OBJECTS)
+vhpop_callable_main_DEPENDENCIES = 
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -159,8 +161,8 @@ AM_V_YACC = $(am__v_YACC_$(V))
 am__v_YACC_ = $(am__v_YACC_$(AM_DEFAULT_VERBOSITY))
 am__v_YACC_0 = @echo "  YACC    " $@;
 am__v_YACC_1 = 
-SOURCES = $(vhpop_SOURCES)
-DIST_SOURCES = $(vhpop_SOURCES)
+SOURCES = $(vhpop_callable_main_SOURCES)
+DIST_SOURCES = $(vhpop_callable_main_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -205,13 +207,13 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /data/phd/temp_evaluation/vhpop/missing aclocal-1.14
+ACLOCAL = ${SHELL} /data/phd/Phd/temp_evaluation/vhpop/missing aclocal-1.14
 ALLOCA = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /data/phd/temp_evaluation/vhpop/missing autoconf
-AUTOHEADER = ${SHELL} /data/phd/temp_evaluation/vhpop/missing autoheader
-AUTOMAKE = ${SHELL} /data/phd/temp_evaluation/vhpop/missing automake-1.14
+AUTOCONF = ${SHELL} /data/phd/Phd/temp_evaluation/vhpop/missing autoconf
+AUTOHEADER = ${SHELL} /data/phd/Phd/temp_evaluation/vhpop/missing autoheader
+AUTOMAKE = ${SHELL} /data/phd/Phd/temp_evaluation/vhpop/missing automake-1.14
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -220,7 +222,7 @@ CPPFLAGS =
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -g -O2 -std=c++0x
+CXXFLAGS = -std=c++0x
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -242,7 +244,7 @@ LEX_OUTPUT_ROOT = lex.yy
 LIBOBJS = 
 LIBS = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /data/phd/temp_evaluation/vhpop/missing makeinfo
+MAKEINFO = ${SHELL} /data/phd/Phd/temp_evaluation/vhpop/missing makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
 PACKAGE = vhpop
@@ -259,10 +261,10 @@ STRIP =
 VERSION = 3.0
 YACC = bison -y
 YFLAGS = 
-abs_builddir = /data/phd/temp_evaluation/vhpop
-abs_srcdir = /data/phd/temp_evaluation/vhpop
-abs_top_builddir = /data/phd/temp_evaluation/vhpop
-abs_top_srcdir = /data/phd/temp_evaluation/vhpop
+abs_builddir = /data/phd/Phd/temp_evaluation/vhpop
+abs_srcdir = /data/phd/Phd/temp_evaluation/vhpop
+abs_top_builddir = /data/phd/Phd/temp_evaluation/vhpop
+abs_top_srcdir = /data/phd/Phd/temp_evaluation/vhpop
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -282,7 +284,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /data/phd/temp_evaluation/vhpop/install-sh
+install_sh = ${SHELL} /data/phd/Phd/temp_evaluation/vhpop/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -302,8 +304,8 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-vhpop_SOURCES = vhpop.cc refcount.cc refcount.h chain.h types.cc types.h terms.cc terms.h predicates.cc predicates.h functions.cc functions.h expressions.cc expressions.h formulas.cc formulas.h effects.cc effects.h actions.cc actions.h domains.cc domains.h problems.cc problems.h bindings.cc bindings.h orderings.cc orderings.h flaws.cc flaws.h heuristics.cc heuristics.h plans.cc plans.h parameters.cc parameters.h requirements.cc requirements.h pddl.yy tokens.ll debug.h
-vhpop_LDADD = 
+vhpop_callable_main_SOURCES = vhpop_callable_main.cc refcount.cc refcount.h chain.h types.cc types.h terms.cc terms.h predicates.cc predicates.h functions.cc functions.h expressions.cc expressions.h formulas.cc formulas.h effects.cc effects.h actions.cc actions.h domains.cc domains.h problems.cc problems.h bindings.cc bindings.h orderings.cc orderings.h flaws.cc flaws.h heuristics.cc heuristics.h plans.cc plans.h parameters.cc parameters.h requirements.cc requirements.h pddl.yy tokens.ll debug.h link.cc link.h vhpop_callable.cc vhpop_callable.h
+vhpop_callable_main_LDADD = 
 MAINTAINERCLEANFILES = pddl.cc tokens.cc
 EXTRA_DIST = getopt.c getopt1.c getopt.h ipc3-vhpop examples scripts
 AM_YFLAGS = -d
@@ -407,9 +409,9 @@ pddl.hh: pddl.cc
 	@if test ! -f $@; then rm -f pddl.cc; else :; fi
 	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) pddl.cc; else :; fi
 
-vhpop$(EXEEXT): $(vhpop_OBJECTS) $(vhpop_DEPENDENCIES) $(EXTRA_vhpop_DEPENDENCIES) 
-	@rm -f vhpop$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(vhpop_OBJECTS) $(vhpop_LDADD) $(LIBS)
+vhpop_callable_main$(EXEEXT): $(vhpop_callable_main_OBJECTS) $(vhpop_callable_main_DEPENDENCIES) $(EXTRA_vhpop_callable_main_DEPENDENCIES) 
+	@rm -f vhpop_callable_main$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(vhpop_callable_main_OBJECTS) $(vhpop_callable_main_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -428,6 +430,7 @@ include ./$(DEPDIR)/flaws.Po
 include ./$(DEPDIR)/formulas.Po
 include ./$(DEPDIR)/functions.Po
 include ./$(DEPDIR)/heuristics.Po
+include ./$(DEPDIR)/link.Po
 include ./$(DEPDIR)/orderings.Po
 include ./$(DEPDIR)/parameters.Po
 include ./$(DEPDIR)/pddl.Po
@@ -439,7 +442,8 @@ include ./$(DEPDIR)/requirements.Po
 include ./$(DEPDIR)/terms.Po
 include ./$(DEPDIR)/tokens.Po
 include ./$(DEPDIR)/types.Po
-include ./$(DEPDIR)/vhpop.Po
+include ./$(DEPDIR)/vhpop_callable.Po
+include ./$(DEPDIR)/vhpop_callable_main.Po
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
