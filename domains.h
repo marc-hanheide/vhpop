@@ -21,7 +21,7 @@
 #ifndef DOMAINS_H
 #define DOMAINS_H
 
-#include <config.h>
+#include "config.h"
 #include "requirements.h"
 #include "actions.h"
 #include "functions.h"
