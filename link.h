@@ -17,6 +17,8 @@ struct Link {
   /* Constructs a causal link. */
   Link(const Link& l);
 
+  Link(size_t from_id, StepTime effect_time, size_t to_id, const Literal * lit, FormulaTime cond_time, bool being_threaten);
+
   /* Deletes this causal link. */
   ~Link();
 
@@ -35,6 +37,23 @@ struct Link {
   /* Returns the time of the condition satisfied by this link. */
   FormulaTime condition_time() const { return condition_time_; }
 
+  void setMerged(bool b) const
+  {
+      being_merged=b;
+  }
+  bool getMerged() const
+  {
+      return being_merged;
+  }
+
+  void setThreaten(bool b) const
+  {
+      being_threaten=b;
+  }
+  bool getThreaten() const
+  {
+      return being_threaten;
+  }
 private:
   /* Id of step that link goes from. */
   size_t from_id_;
@@ -46,6 +65,8 @@ private:
   const Literal* condition_;
   /* Time of condition satisfied by link. */
   FormulaTime condition_time_;
+  mutable bool being_merged;
+  mutable bool being_threaten;
 };
 
 

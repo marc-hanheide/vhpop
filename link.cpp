@@ -19,7 +19,15 @@ Link::Link(size_t from_id, StepTime effect_time,
        const OpenCondition& open_cond)
   : from_id_(from_id), effect_time_(effect_time), to_id_(open_cond.step_id()),
     condition_(open_cond.literal()), condition_time_(open_cond.when()) {
+    being_merged = false;
+    being_threaten = false;
   Formula::register_use(condition_);
+}
+
+Link::Link(size_t from_id, StepTime effect_time, size_t to_id, const Literal * lit, FormulaTime cond_time, bool being_threat)
+  :from_id_(from_id), effect_time_(effect_time), to_id_(to_id), condition_time_(cond_time),being_threaten(being_threat)
+{
+    condition_ = lit; //just reassigning the pointer, because lit is already copied whenever this is called
 }
 
 
@@ -27,6 +35,8 @@ Link::Link(size_t from_id, StepTime effect_time,
 Link::Link(const Link& l)
   : from_id_(l.from_id_), effect_time_(l.effect_time_), to_id_(l.to_id_),
     condition_time_(l.condition_time_) {
+    being_merged = false;
+    being_threaten = false;
 
   if (l.condition_ !=0)
   {

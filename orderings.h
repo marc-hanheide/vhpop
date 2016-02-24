@@ -49,6 +49,8 @@ struct StepTime {
   StepPoint point;
   StepRel rel;
 
+  StepTime(){}
+
 private:
   StepTime(StepPoint point, StepRel rel) : point(point), rel(rel) {}
 };
