@@ -79,6 +79,8 @@ struct Step {
   /* Returns the action that this step is instantiated from. */
   const Action& action() const { return *action_; }
 
+  friend bool operator== (Step &s1, Step &s2);
+
 
 
 private:

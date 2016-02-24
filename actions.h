@@ -88,6 +88,8 @@ struct Action {
   /*copy constructor*/
   Action(const Action& s);
 
+  friend bool operator== (Action &a1, Action &a2);
+
 protected:
   /* Constructs an action with the given name. */
   Action(const std::string& name, bool durative);

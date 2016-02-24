@@ -21,6 +21,7 @@
 #include <limits>
 #include <stack>
 #include <typeinfo>
+#include <memory>
 
 
 /* ====================================================================== */
@@ -78,6 +79,108 @@ Action::Action(const Action &s)
 
 }
 
+bool operator== (Action &a1, Action &a2)
+{
+
+    if(a1.id_ != a2.id_)
+        return false;
+    if(a1.name_ != a2.name_)
+        return false;
+    if(a1.durative_ != a2.durative_)
+        return false;
+    if(a1.min_duration_->value()!=a2.min_duration_->value())
+        return false;
+    if(a1.max_duration_->value()!=a2.max_duration_->value())
+        return false;
+
+    //TODO this comparision is missing effects
+    int iter = 0;
+
+    FormulaList formList;
+    formList.push_back(a1.condition_->clone());
+
+    FormulaList formList2;
+    formList2.push_back(a2.condition_->clone());
+
+    FormulaList::iterator itf = formList.begin();
+    FormulaList::iterator itf2 = formList2.begin();
+
+
+
+    while(itf < formList.end())
+    {
+        char typeOfFormula = (*itf)->type();
+        char typeOfFormula2 = (*itf2)->type();
+        if(typeOfFormula != typeOfFormula2)
+        {
+            return false;
+        }
+        switch(typeOfFormula)
+        {
+           case 'a':
+           {
+             std::unique_ptr<const Atom> at (dynamic_cast<const Atom*>(*itf));
+             std::unique_ptr<const Atom> at2 (dynamic_cast<const Atom*>(*itf2));
+             Atom a1 = *at;
+             Atom a2 = *at2;
+             if (!(a1 == a2))
+             {
+                 return false;
+             }
+             break;
+           }
+           case 'n':
+           {
+             std::unique_ptr<const Negation> neg (dynamic_cast<const Negation*>(*itf));
+             std::unique_ptr<const Negation> neg2 (dynamic_cast<const Negation*>(*itf2));
+             Negation n1 = *neg;
+             Negation n2 = *neg2;
+             if(!(n1 == n2))
+             {
+                 return false;
+             }
+             break;
+           }
+           case 'j':
+           {
+             std::unique_ptr<const Conjunction> conj (dynamic_cast<const Conjunction*>(*itf));
+             std::unique_ptr<const Conjunction> conj2 (dynamic_cast<const Conjunction*>(*itf2));
+             FormulaList tempL = conj->conjuncts();
+             FormulaList tempL2 = conj2->conjuncts();
+
+             if(tempL.size() != tempL2.size())
+                 return false;
+
+             for(int i = 0;i<tempL.size();i++)
+             {
+                 //need to create a new pointer
+               formList.push_back( tempL.at(i)->clone());
+               formList2.push_back( tempL2.at(i)->clone());
+             }
+             break;
+           }
+           case 't':
+           {
+             std::unique_ptr<const TimedLiteral> tl (dynamic_cast<const TimedLiteral*>(*itf));
+             std::unique_ptr<const TimedLiteral> tl2 (dynamic_cast<const TimedLiteral*>(*itf2));
+             formList.push_back(tl->literal().clone());
+             formList2.push_back(tl2->literal().clone());
+             break;
+           }
+           default:
+           {
+            std::cout << "this type of formula is not yet covered\n";
+            throw;
+            break;
+           }
+        }
+        iter++;
+        itf = formList.begin()+iter;//increase iterator
+        itf2 = formList2.begin()+iter;//increase iterator
+     }
+
+     return true;
+}
 
 /* Deletes this action. */
 Action::~Action() {

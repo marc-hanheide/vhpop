@@ -117,6 +117,9 @@ struct Formula {
   //virtual const Formula * create () const = 0; // Virtual constructor (creation)
   virtual const Formula * clone () const = 0;
 
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  virtual const char type() const = 0;
+
 protected:
   /* Constructs a formula. */
   Formula();
@@ -192,6 +195,12 @@ struct Constant : public Formula {
       return new Constant(*this);
   }
 
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'c';
+  }
+
 
 
 protected:
@@ -258,6 +267,11 @@ struct Literal : public Formula {
 
 
   virtual const Literal * clone() const
+  {
+  }
+
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  virtual const char type() const
   {
   }
 
@@ -355,6 +369,12 @@ struct Atom : public Literal {
   const Atom * clone() const
   {
       return new Atom(*this);
+  }
+
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'a';
   }
 
   friend bool operator== (Atom &l1, Atom &l2);
@@ -462,6 +482,12 @@ struct Negation : public Literal {
       return new Negation(*this);
   }
 
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'n';
+  }
+
   friend bool operator== (Negation &l1, Negation &l2);
 
 protected:
@@ -533,6 +559,10 @@ struct BindingLiteral : public Formula {
   virtual const BindingLiteral * clone() const
   {
   }
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  virtual const char type() const
+  {
+  }
 
 protected:
   /* Constructs a binding literal. */
@@ -594,6 +624,11 @@ struct Equality : public BindingLiteral {
   {
       return new Equality(*this);
   }
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'e';
+  }
 
 protected:
   /* Returns the negation of this formula. */
@@ -647,6 +682,11 @@ struct Inequality : public BindingLiteral {
   const Inequality * clone() const
   {
       return new Inequality(*this);
+  }
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'i';
   }
 
 protected:
@@ -719,6 +759,11 @@ struct Conjunction : public Formula {
   {
       return new Conjunction(*this);
   }
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'j';
+  }
 
 protected:
   /* Returns the negation of this formula. */
@@ -789,6 +834,12 @@ struct Disjunction : public Formula {
       return new Disjunction(*this);
   }
 
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'd';
+  }
+
 protected:
   /* Returns the negation of this formula. */
   virtual const Formula& negation() const;
@@ -840,6 +891,11 @@ struct Quantification : public Formula {
 
   virtual const Quantification * clone() const
   {}
+
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  virtual const char type() const
+  {
+  }
 
 
 protected:
@@ -894,6 +950,11 @@ struct Exists : public Quantification {
   {
       return new Exists(*this);
   }
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'x';
+  }
 
 protected:
   /* Returns the negation of this formula. */
@@ -945,6 +1006,11 @@ struct Forall : public Quantification {
   const Forall * clone() const
   {
       return new Forall(*this);
+  }
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 'f';
   }
 
 protected:
@@ -1028,6 +1094,11 @@ struct TimedLiteral : public Formula {
   const TimedLiteral * clone() const
   {
       return new TimedLiteral(*this);
+  }
+  //adding a method which return a char corresponding to the type of the class -> bypassing dynamic cast
+  const char type() const
+  {
+      return 't';
   }
 
 protected:
