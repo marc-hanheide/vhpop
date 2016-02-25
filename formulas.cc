@@ -22,6 +22,7 @@
 #include "debug.h"
 #include <stack>
 #include <iostream>
+#include <sstream>
 
 
 /* ====================================================================== */
@@ -465,7 +466,16 @@ bool operator== (Atom &l1, Atom &l2)
 {
    bool b = true; //TODO FIX
 
-   if(l1.predicate_ != l2.predicate_)
+   //predicates are compared as numbers and not as they values
+   //I am bypassing it here
+   std::stringstream p1;
+   std::stringstream p2;
+
+   p1 << l1.predicate();
+   p2 << l2.predicate();
+
+   if (p1.str() != p2.str())
+   //if(l1.predicate()!=l2.predicate())
    {
        b = false;
    }
@@ -475,6 +485,8 @@ bool operator== (Atom &l1, Atom &l2)
    //this one is wrong
    /*if(l1.atoms != l2.atoms)
        b = false;*/
+
+
    if(l1.id() != l2.id())
        b=false;
 

@@ -66,8 +66,8 @@ bool operator== (Step &s1, Step &s2)
     if(s1.id_ != s2.id_)
         return false;
 
-    std::unique_ptr<const ActionSchema> a1 (dynamic_cast<const ActionSchema*>(s1.action_));
-    std::unique_ptr<const ActionSchema> a2 (dynamic_cast<const ActionSchema*>(s2.action_));
+    std::unique_ptr<const ActionSchema> a1 (dynamic_cast<const ActionSchema*>(s1.action_->clone()));
+    std::unique_ptr<const ActionSchema> a2 (dynamic_cast<const ActionSchema*>(s2.action_->clone()));
 
     if((a1.get()!=NULL)&&(a2.get()!=NULL))
     {
@@ -78,8 +78,8 @@ bool operator== (Step &s1, Step &s2)
     }
     else
     {
-        std::unique_ptr<const GroundAction> ag1 (dynamic_cast<const GroundAction*>(s1.action_));
-        std::unique_ptr<const GroundAction> ag2 (dynamic_cast<const GroundAction*>(s2.action_));
+        std::unique_ptr<const GroundAction> ag1 (dynamic_cast<const GroundAction*>(s1.action_->clone()));
+        std::unique_ptr<const GroundAction> ag2 (dynamic_cast<const GroundAction*>(s2.action_->clone()));
 
         if((ag1.get()!=NULL)&&(ag2.get()!=NULL))
         {
