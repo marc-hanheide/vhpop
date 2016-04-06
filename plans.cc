@@ -418,35 +418,45 @@ static const Bindings* step_instantiation(const Chain<Step>* steps, size_t n,
 					  const Bindings& bindings) {
   if (steps == NULL) {
     return &bindings;
-  } else {
+  }
+  else
+  {
     const Step& step = steps->head;
     const ActionSchema* as = dynamic_cast<const ActionSchema*>(&step.action());
-    if (as == NULL || as->parameters().size() <= n) {
+    if (as == NULL || as->parameters().size() <= n)
+    {
       return step_instantiation(steps->tail, 0, bindings);
-    } else {
+    }
+    else
+    {
       const Variable& v = as->parameters()[n];
-      if (v != bindings.binding(v, step.id())) {
-	return step_instantiation(steps, n + 1, bindings);
-      } else {
-	const Type& t = TermTable::type(v);
-	const ObjectList& arguments = problem->terms().compatible_objects(t);
-	for (ObjectList::const_iterator oi = arguments.begin();
-	     oi != arguments.end(); oi++) {
-	  BindingList bl;
-	  bl.push_back(Binding(v, step.id(), *oi, 0, true));
-	  const Bindings* new_bindings = bindings.add(bl);
-	  if (new_bindings != NULL) {
-	    const Bindings* result = step_instantiation(steps, n + 1,
-							*new_bindings);
-	    if (result != new_bindings) {
-	      delete new_bindings;
-	    }
-	    if (result != NULL) {
-	      return result;
-	    }
-	  }
-	}
-	return NULL;
+      if (v != bindings.binding(v, step.id()))
+      {
+        return step_instantiation(steps, n + 1, bindings);
+      }
+      else
+      {
+        const Type& t = TermTable::type(v);
+        const ObjectList& arguments = problem->terms().compatible_objects(t);
+        for (ObjectList::const_iterator oi = arguments.begin(); oi != arguments.end(); oi++)
+        {
+           BindingList bl;
+           bl.push_back(Binding(v, step.id(), *oi, 0, true));
+           const Bindings* new_bindings = bindings.add(bl);
+           if (new_bindings != NULL)
+           {
+              const Bindings* result = step_instantiation(steps, n + 1,*new_bindings);
+              if (result != new_bindings)
+              {
+                 delete new_bindings;
+              }
+              if (result != NULL)
+              {
+                 return result;
+              }
+           }
+         }
+        return NULL;
       }
     }
   }
@@ -707,6 +717,7 @@ const Plan* Plan::plan(const Problem& problem, const Parameters& p,
 
       if (verbosity > 1)
       {
+         std::ostream &osx = std::cerr;
          std::cerr << std::endl << (num_visited_plans - num_static) << ": "
 		  << "!!!!CURRENT PLAN (id " << current_plan->id_ << ")"
 		  << " with rank (" << current_plan->primary_rank();
@@ -716,6 +727,8 @@ const Plan* Plan::plan(const Problem& problem, const Parameters& p,
            std::cerr << ',' << current_plan->rank_[ri];
          }
          std::cerr << ")" << std::endl << *current_plan << std::endl;
+
+
       }
 
       /* List of children to current plan. */
@@ -846,6 +859,10 @@ const Plan* Plan::plan(const Problem& problem, const Parameters& p,
           const Bindings* new_bindings =
           step_instantiation(current_plan->steps(), 0,
 			       *current_plan->bindings_);
+
+          std::ostream &osx = std::cout;
+          new_bindings->print(osx);
+          std::cout << "\n";
 
           if (new_bindings != NULL)
           {
@@ -2148,6 +2165,10 @@ int Plan::make_link(PlanList& plans, const Step& step, const Effect& effect,
     }
 
     /* Adds the new plan. */
+    //std::ostream &osx1 = std::cout;
+    //std::cout << "make link bindings\n";
+    //bindings->print(osx1);
+    //std::cout << "\n";
     plans.push_back(new Plan(new_steps, new_num_steps, new_links,
 			     num_links() + 1, *new_orderings, *bindings,
 			     new_unsafes, new_num_unsafes,
@@ -2334,16 +2355,16 @@ std::ostream& operator<<(std::ostream& os, const Plan& p) {
 	 si != ordered_steps.end(); si++) {
       const Step& step = **si;
       if (step.id() == Plan::GOAL_ID) {
-	os << std::endl << std::endl << "Goal     : ";
+    os << std::endl << std::endl << "Goal     : ";
       } else {
-	os << std::endl << std::endl << "Step " << step.id();
+    os << std::endl << std::endl << "Step " << step.id();
 	if (step.id() < 100) {
 	  if (step.id() < 10) {
-	    os << ' ';
+        os << ' ';
 	  }
-	  os << ' ';
+      os << ' ';
 	}
-	os << " : ";
+    os << " : ";
 	step.action().print(os, step.id(), *bindings);
 	for (const Chain<MutexThreat>* mc = p.mutex_threats();
 	     mc != NULL; mc = mc->tail) {

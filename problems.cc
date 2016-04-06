@@ -190,8 +190,11 @@ bool Problem::constant_metric() const {
 /* Fills the provided action list with ground actions instantiated
    from the action schemas of the domain. */
 void Problem::instantiated_actions(GroundActionList& actions) const {
+    //int count =0;
   for (ActionSchemaMap::const_iterator ai = domain().actions().begin();
        ai != domain().actions().end(); ai++) {
+      //count++;
+      //std::cout << "problem::instantiated_actions" << count << "\n";
     (*ai).second->instantiations(actions, *this);
   }
 }

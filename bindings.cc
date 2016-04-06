@@ -28,6 +28,7 @@
 #include <typeinfo>
 
 
+
 /* ====================================================================== */
 /* StepVariable */
 
@@ -890,7 +891,10 @@ bool Bindings::unify(BindingList& mgu, const Literal& l1, size_t id1,
         }
         else
         {
-            return false; //they are not same type
+            //TODO really test this LENKO
+            std::cout << "not covered type in Bindings::unify\n";
+            throw;
+            //return false; //they are not same type
         }
 
     }
@@ -1084,7 +1088,16 @@ const Bindings* Bindings::add(const BindingList& new_bindings,
   BindingList new_binds(new_bindings);
   /*
    * Add new bindings one at a time.
+   *
    */
+
+  //Lenka added
+  //std::ostream &osx = std::cout;
+  //std::cout << "current bindings\n";
+  //TODO here I should print out new_bindings
+
+  //print(osx);
+  //std::cout << "\n";
   for (size_t i = 0; i < new_binds.size(); i++) {
     /*
      * N.B. Make a copy of the binding instead of just saving a
@@ -1099,201 +1112,313 @@ const Bindings* Bindings::add(const BindingList& new_bindings,
       /* Varset for variable. */
       const Varset* vs1;
       StepVariable sv(bind.var(), bind.var_id());
-      if (bind.var_id() <= high_step_
-	  || high_step_vars.find(sv) != high_step_vars.end()) {
-	vs1 = find_varset(varsets, bind.var(), bind.var_id());
-      } else {
-	if (bind.var_id() > high_step) {
-	  high_step = bind.var_id();
-	}
-	high_step_vars.insert(sv);
-	vs1 = 0;
+      if (bind.var_id() <= high_step_ || high_step_vars.find(sv) != high_step_vars.end())
+      {
+        vs1 = find_varset(varsets, bind.var(), bind.var_id());
       }
+      else
+      {
+        if (bind.var_id() > high_step)
+        {
+           high_step = bind.var_id();
+        }
+        high_step_vars.insert(sv);
+        vs1 = 0;
+      }
+      /*lenka added print out*/
+      //osx << std::endl << "{\n";
+      //osx << ' ' << sv.first << '(' << sv.second << ')';
+      //osx << " }\n";
+      /*if(vs1 != 0)
+      {
+          if (vs1->constant() != 0)
+          {
+            osx << " == ";
+          }
+
+          if (vs1->constant() != 0)
+          {
+            const Object& obj = *vs1->constant();
+            osx << obj;
+            osx << "\n";
+          }
+      }*/
+      /*end lenka*/
+
+
+
       /* Varset for term. */
       const Varset* vs2;
-      if (bind.term().object()) {
-	vs2 = find_varset(varsets, bind.term().as_object());
-      } else {
-	StepVariable sv(bind.term().as_variable(), bind.term_id());
-	if (bind.term_id() <= high_step_
-	    || high_step_vars.find(sv) != high_step_vars.end()) {
-	  vs2 = find_varset(varsets, sv.first, bind.term_id());
-	} else {
-	  if (bind.term_id() > high_step) {
-	    high_step = bind.term_id();
-	  }
-	  high_step_vars.insert(sv);
-	  vs2 = 0;
-	}
+      if (bind.term().object())
+      {
+        vs2 = find_varset(varsets, bind.term().as_object());
+
+        /*lenka added print out*/
+        /*if(vs2 != 0)
+        {
+            if (vs2->constant() != 0)
+            {
+              osx << " ==\n ";
+            }
+
+            if (vs2->constant() != 0)
+            {
+              const Object& obj = *vs2->constant();
+              osx << obj;
+              osx << "\n";
+            }
+        }*/
+        /*end lenka*/
+      }
+      else
+      {
+         StepVariable sv(bind.term().as_variable(), bind.term_id());
+         if (bind.term_id() <= high_step_ || high_step_vars.find(sv) != high_step_vars.end())
+         {
+            vs2 = find_varset(varsets, sv.first, bind.term_id());
+         }
+         else
+         {
+            if (bind.term_id() > high_step)
+            {
+               high_step = bind.term_id();
+            }
+            high_step_vars.insert(sv);
+            vs2 = 0;
+         }
+         /*lenka added print out*/
+         /*osx << std::endl << "{\n";
+         osx << ' ' << sv.first << '(' << sv.second << ')';
+         osx << " }\n";
+         if(vs2 != 0)
+         {
+             if (vs2->constant() != 0)
+             {
+               osx << " == ";
+             }
+
+             if (vs2->constant() != 0)
+             {
+               const Object& obj = *vs2->constant();
+               osx << obj;
+               osx << "\n";
+             }
+         }*/
+         /*end lenka*/
       }
       /* Combined varset, or 0 if binding is inconsistent with
          current bindings. */
       const Varset* comb;
-      if (vs1 != 0 || vs2 != 0) {
-	/* At least one of the terms is already bound. */
-	if (vs1 != vs2) {
-	  /* The terms are not yet bound to eachother. */
-	  if (vs1 == 0) {
-	    /* The first term is unbound, so add it to the varset of
+      if (vs1 != 0 || vs2 != 0)
+      {
+        /* At least one of the terms is already bound. */
+        if (vs1 != vs2)
+        {
+           /* The terms are not yet bound to eachother. */
+           if (vs1 == 0)
+           {
+               /* The first term is unbound, so add it to the varset of
                the second. */
-	    comb = vs2->add(varsets, bind.var(), bind.var_id());
-	  } else if (vs2 == 0) {
-	    /* The second term is unbound, so add it to the varset of
+               comb = vs2->add(varsets, bind.var(), bind.var_id());
+           }
+           else if (vs2 == 0)
+           {
+               /* The second term is unbound, so add it to the varset of
                the first. */
-	    comb = vs1->add(varsets, bind.term(), bind.term_id());
-	  } else {
-	    /* Both terms are bound, so combine their varsets. */
-	    comb = vs1->combine(varsets, *vs2);
-	  }
-	} else {
-	  /* The terms are already bound to eachother. */
-	  comb = vs1;
-	}
-      } else {
-	/* None of the terms are already bound. */
-	comb = Varset::make(varsets, bind);
+               comb = vs1->add(varsets, bind.term(), bind.term_id());
+           }
+           else
+           {
+               /* Both terms are bound, so combine their varsets. */
+               comb = vs1->combine(varsets, *vs2);
+           }
+        }
+        else
+        {
+            /* The terms are already bound to eachother. */
+           comb = vs1;
+        }
       }
-      if (comb == 0) {
-	/* Binding is inconsistent with current bindings. */
-	RCObject::ref(varsets);
-	RCObject::destructive_deref(varsets);
-	RCObject::ref(step_domains);
-	RCObject::destructive_deref(step_domains);
-	return 0;
-      } else {
-	/* Binding is consistent with current bindings. */
-	if (comb != vs1) {
-	  /* Combined varset is new, so add it to the chain of varsets. */
-	  const Object* obj = comb->constant();
-	  /* Restrict step domain for all codesignated variables. */
-	  const NameSet* intersection = 0;
-	  bool new_intersection = false;
-	  const Chain<StepVariable>* vc = 0;
-	  int phase = 0;
-	  while (phase < 4 || (intersection != 0 && phase < 8)) {
-	    const Variable* var = 0;
-	    size_t var_id = 0;
-	    switch (phase) {
-	    case 0:
-	    case 4:
-	      if (vs1 == 0) {
-		var = new Variable(bind.var());
-		var_id = bind.var_id();
-		phase += 2;
-	      } else if (vs1->constant() == 0) {
-		vc = vs1->cd_set();
-		phase++;
-	      } else {
-		phase += 2;
-	      }
-	      break;
-	    case 1:
-	    case 3:
-	    case 5:
-	    case 7:
-	      if (vc != 0) {
-		var = new Variable(vc->head.first);
-		var_id = vc->head.second;
-		vc = vc->tail;
-	      } else {
-		var = 0;
-		phase++;
-	      }
-	      break;
-	    case 2:
-	    case 6:
-	      if (vs2 == 0) {
-		var = (bind.term().variable()
-		       ? new Variable(bind.term().as_variable()) : 0);
-		var_id = bind.term_id();
-		phase += 2;
-	      } else if (vs2->constant() == 0) {
-		vc = vs2->cd_set();
-		phase++;
-	      } else {
-		phase += 2;
-	      }
-	      break;
-	    }
-	    if (var != 0) {
-	      /* Step domain for variable. */
-	      std::pair<const StepDomain*, size_t> sd =
-		find_step_domain(step_domains, *var, var_id);
-	      delete var;
-	      if (sd.first != 0) {
-		if (obj != 0) {
-		  const StepDomain* new_sd =
-		    sd.first->restrict(step_domains, *obj, sd.second);
-		  if (new_sd == 0) {
-		    /* Domain became empty. */
-		    RCObject::ref(varsets);
-		    RCObject::destructive_deref(varsets);
-		    RCObject::ref(step_domains);
-		    RCObject::destructive_deref(step_domains);
-		    if (new_intersection) {
-		      delete intersection;
-		    }
-		    return 0;
-		  }
-		  if (sd.first != new_sd) {
-		    add_domain_bindings(new_binds, *sd.first, *new_sd,
-					sd.second);
-		  }
-		} else {
-		  if (phase > 4) {
-		    const StepDomain* new_sd =
-		      sd.first->restrict(step_domains,
-					 *intersection, sd.second);
-		    if (new_sd == 0) {
-		      /* Domain became empty. */
-		      RCObject::ref(varsets);
-		      RCObject::destructive_deref(varsets);
-		      RCObject::ref(step_domains);
-		      RCObject::destructive_deref(step_domains);
-		      if (new_intersection) {
-			delete intersection;
-		      }
-		      return 0;
-		    }
-		    if (sd.first != new_sd) {
-		      add_domain_bindings(new_binds, *sd.first, *new_sd);
-		    }
-		  } else if (intersection == 0) {
-		    intersection = &sd.first->projection(sd.second);
-		  } else {
-		    NameSet* cut = new NameSet();
-		    const NameSet& set2 = sd.first->projection(sd.second);
-		    set_intersection(intersection->begin(),
-				     intersection->end(),
-				     set2.begin(), set2.end(),
-				     inserter(*cut, cut->begin()));
-		    if (new_intersection) {
-		      delete intersection;
-		    }
-		    intersection = cut;
-		    new_intersection = true;
-		    if (intersection->empty()) {
-		      /* Domain became empty. */
-		      RCObject::ref(varsets);
-		      RCObject::destructive_deref(varsets);
-		      RCObject::ref(step_domains);
-		      RCObject::destructive_deref(step_domains);
-		      if (new_intersection) {
-			delete intersection;
-		      }
-		      return 0;
-		    }
-		  }
-		}
-	      }
-	    }
-	  }
-	  if (new_intersection) {
-	    delete intersection;
-	  }
-	}
+      else
+      {
+         /* None of the terms are already bound. */
+         comb = Varset::make(varsets, bind);
       }
-    } else {
+      if (comb == 0)
+      {
+         /* Binding is inconsistent with current bindings. */
+          RCObject::ref(varsets);
+          RCObject::destructive_deref(varsets);
+          RCObject::ref(step_domains);
+          RCObject::destructive_deref(step_domains);
+          return 0;
+      }
+      else
+      {
+        /* Binding is consistent with current bindings. */
+        if (comb != vs1)
+        {
+           /* Combined varset is new, so add it to the chain of varsets. */
+           const Object* obj = comb->constant();
+           /* Restrict step domain for all codesignated variables. */
+           const NameSet* intersection = 0;
+           bool new_intersection = false;
+           const Chain<StepVariable>* vc = 0;
+           int phase = 0;
+           while (phase < 4 || (intersection != 0 && phase < 8))
+           {
+              const Variable* var = 0;
+              size_t var_id = 0;
+              switch (phase)
+              {
+                 case 0:
+                 case 4:
+                    if (vs1 == 0)
+                    {
+                       var = new Variable(bind.var());
+                       var_id = bind.var_id();
+                       phase += 2;
+                    }
+                    else if (vs1->constant() == 0)
+                    {
+                       vc = vs1->cd_set();
+                       phase++;
+                    }
+                    else
+                    {
+                       phase += 2;
+                    }
+                    break;
+                 case 1:
+                 case 3:
+                 case 5:
+                 case 7:
+                    if (vc != 0)
+                    {
+                       var = new Variable(vc->head.first);
+                       var_id = vc->head.second;
+                       vc = vc->tail;
+                    }
+                    else
+                    {
+                       var = 0;
+                       phase++;
+                    }
+                    break;
+                 case 2:
+                 case 6:
+                  if (vs2 == 0)
+                  {
+                     var = (bind.term().variable() ? new Variable(bind.term().as_variable()) : 0);
+                     var_id = bind.term_id();
+                     phase += 2;
+                  }
+                  else if (vs2->constant() == 0)
+                  {
+                     vc = vs2->cd_set();
+                     phase++;
+                  }
+                  else
+                  {
+                     phase += 2;
+                  }
+                  break;
+               }//end of switch
+             if (var != 0)
+             {
+               /* Step domain for variable. */
+               std::pair<const StepDomain*, size_t> sd =find_step_domain(step_domains, *var, var_id);
+               delete var;
+               if (sd.first != 0)
+               {
+                  if (obj != 0)
+                  {
+                     const StepDomain* new_sd = sd.first->restrict(step_domains, *obj, sd.second);
+                     if (new_sd == 0)
+                     {
+                        /* Domain became empty. */
+                        RCObject::ref(varsets);
+                        RCObject::destructive_deref(varsets);
+                        RCObject::ref(step_domains);
+                        RCObject::destructive_deref(step_domains);
+                        if (new_intersection)
+                        {
+                           delete intersection;
+                        }
+                        return 0;
+                     }
+                     if (sd.first != new_sd)
+                     {
+                        add_domain_bindings(new_binds, *sd.first, *new_sd,sd.second);
+                     }
+                  }
+                  else
+                  {
+                     if (phase > 4)
+                     {
+                        const StepDomain* new_sd = sd.first->restrict(step_domains, *intersection, sd.second);
+                        if (new_sd == 0)
+                        {
+                           /* Domain became empty. */
+                           RCObject::ref(varsets);
+                           RCObject::destructive_deref(varsets);
+                           RCObject::ref(step_domains);
+                           RCObject::destructive_deref(step_domains);
+                           if (new_intersection)
+                           {
+                              delete intersection;
+                           }
+                           return 0;
+                        }
+                        if (sd.first != new_sd)
+                        {
+                           add_domain_bindings(new_binds, *sd.first, *new_sd);
+                        }
+                    }
+                    else if (intersection == 0)
+                    {
+                       intersection = &sd.first->projection(sd.second);
+                    }
+                    else
+                    {
+                       NameSet* cut = new NameSet();
+                       const NameSet& set2 = sd.first->projection(sd.second);
+                       set_intersection(intersection->begin(), intersection->end(),
+                                        set2.begin(), set2.end(),
+                                        inserter(*cut, cut->begin()));
+                       if (new_intersection)
+                       {
+                         delete intersection;
+                       }
+                       intersection = cut;
+                       new_intersection = true;
+                       if (intersection->empty())
+                       {
+                          /* Domain became empty. */
+                          RCObject::ref(varsets);
+                          RCObject::destructive_deref(varsets);
+                          RCObject::ref(step_domains);
+                          RCObject::destructive_deref(step_domains);
+                          if (new_intersection)
+                          {
+                             delete intersection;
+                          }
+                          return 0;
+                       }
+                    }
+                  }
+                }
+              }
+            }//end while
+            if (new_intersection)
+            {
+              delete intersection;
+            }
+         }
+       }
+    }
+    else
+    {
       /*
        * Adding inequality binding.
        */
@@ -1435,8 +1560,23 @@ const Bindings* Bindings::add(const BindingList& new_bindings,
     RCObject::destructive_deref(varsets);
     RCObject::ref(step_domains);
     RCObject::destructive_deref(step_domains);
+
+    //Lenka added
+    Bindings * local = new Bindings(varsets, high_step, step_domains);
+    //Lenka added
+    //std::ostream &osx = std::cout;
+    //std::cout << "local bindings\n";
+    //local->print(osx);
+    //std::cout << "\n";
     return this;
   } else {
+      //Lenka added
+      Bindings * local = new Bindings(varsets, high_step, step_domains);
+      //Lenka added
+      //std::ostream &osx = std::cout;
+      //std::cout << "local bindings\n";
+      //local->print(osx);
+      //std::cout << "\n";
     return new Bindings(varsets, high_step, step_domains);
   }
 }
@@ -1494,42 +1634,50 @@ const Bindings* Bindings::add(size_t step_id, const Action& step_action,
 void Bindings::print(std::ostream& os) const {
   std::map<size_t, std::vector<Variable> > seen_vars;
   std::vector<Object> seen_objs;
-  for (const Chain<Varset>* vsc = varsets_; vsc != 0; vsc = vsc->tail) {
+  for (const Chain<Varset>* vsc = varsets_; vsc != 0; vsc = vsc->tail)
+  {
     const Varset& vs = vsc->head;
-    if (vs.cd_set() != 0) {
+    if (vs.cd_set() != 0)
+    {
       const Chain<StepVariable>* vc = vs.cd_set();
       if (find(seen_vars[vc->head.second].begin(),
-	       seen_vars[vc->head.second].end(), vc->head.first)
-	  != seen_vars[vc->head.second].end()) {
-	continue;
+               seen_vars[vc->head.second].end(),
+               vc->head.first) != seen_vars[vc->head.second].end())
+      {
+        continue;
       }
       os << std::endl << "{";
-      for (; vc != 0; vc = vc->tail) {
-	const StepVariable& step_var = vc->head;
-	os << ' ' << step_var.first << '(' << step_var.second << ')';
-	seen_vars[step_var.second].push_back(step_var.first);
+      for (; vc != 0; vc = vc->tail)
+      {
+        const StepVariable& step_var = vc->head;
+        os << ' ' << step_var.first << '(' << step_var.second << ')';
+        seen_vars[step_var.second].push_back(step_var.first);
       }
       os << " }";
-      if (vs.constant() != 0) {
-	os << " == ";
+      if (vs.constant() != 0)
+      {
+        os << " == ";
       }
     }
-    if (vs.constant() != 0) {
+    if (vs.constant() != 0)
+    {
       const Object& obj = *vs.constant();
-      if (find(seen_objs.begin(), seen_objs.end(), obj) != seen_objs.end()) {
-	continue;
+      if (find(seen_objs.begin(), seen_objs.end(), obj) != seen_objs.end())
+      {
+         continue;
       }
-      if (vs.cd_set() == 0) {
-	os << std::endl;
+      if (vs.cd_set() == 0)
+      {
+        os << std::endl;
       }
       os << obj;
       seen_objs.push_back(obj);
     }
     if (vs.ncd_set() != 0) {
       os << " != {";
-      for (const Chain<StepVariable>* vc =
-	     vs.ncd_set(); vc != 0; vc = vc->tail) {
-	os << ' ' << vc->head.first << '(' << vc->head.second << ')';
+      for (const Chain<StepVariable>* vc = vs.ncd_set(); vc != 0; vc = vc->tail)
+      {
+         os << ' ' << vc->head.first << '(' << vc->head.second << ')';
       }
       os << " }";
     }

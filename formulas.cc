@@ -273,7 +273,21 @@ const Formula& Literal::separator(const Effect& effect,
 /* Tests if the two atoms are unifiable, assuming the second atom is
    fully instantiated. */
 static bool unifiable_atoms(const Atom& a1, const Atom& a2) {
-  if (a1.predicate() != a2.predicate()) {
+    //predicates are compared as numbers and not as they values
+    //I am bypassing it here
+    std::stringstream p1;
+    std::stringstream p2;
+
+    p1 << a1.predicate();
+    p2 << a2.predicate();
+
+    std::string s1 = p1.str();
+    std::string s2 = p2.str();
+
+
+
+  if (s1 != s2){
+  //if (a1.predicate() != a2.predicate()) {
     return false;
   } else {
     SubstitutionMap bind;
@@ -447,7 +461,7 @@ const Formula& Atom::universal_base(const SubstitutionMap& subst,
 void Atom::print(std::ostream& os,
 		 size_t step_id, const Bindings& bindings) const {
   os << '(' << predicate();
-  std::cout << predicate() << "\n";
+
   for (TermList::const_iterator ti = terms_.begin();
        ti != terms_.end(); ti++) {
     os << ' ';

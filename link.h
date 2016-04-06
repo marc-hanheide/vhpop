@@ -17,7 +17,10 @@ struct Link {
   /* Constructs a causal link. */
   Link(const Link& l);
 
-  Link(size_t from_id, StepTime effect_time, size_t to_id, const Literal * lit, FormulaTime cond_time, bool being_threaten);
+  /* Constructs a causal link. */
+  Link(const Link& l, size_t task_id);
+
+  Link(size_t from_id, StepTime effect_time, size_t to_id, const Literal * lit, FormulaTime cond_time, bool being_threaten, std::string type);
 
   /* Deletes this causal link. */
   ~Link();
@@ -54,6 +57,22 @@ struct Link {
   {
       return being_threaten;
   }
+
+  void setType(std::string s)
+  {
+      type_ = s;
+  }
+
+  std::string getType()
+   {
+      return type_;
+  }
+
+  size_t getTaskId() const
+  {
+      return task_id_;
+  }
+
 private:
   /* Id of step that link goes from. */
   size_t from_id_;
@@ -64,9 +83,11 @@ private:
   /* Condition satisfied by link. */
   const Literal* condition_;
   /* Time of condition satisfied by link. */
+  size_t task_id_;
   FormulaTime condition_time_;
   mutable bool being_merged;
   mutable bool being_threaten;
+  mutable std::string type_;
 };
 
 

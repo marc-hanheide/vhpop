@@ -1091,6 +1091,7 @@ struct TimedLiteral : public Formula {
       register_use(literal_);
   }
 
+
   const TimedLiteral * clone() const
   {
       return new TimedLiteral(*this);

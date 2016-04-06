@@ -820,9 +820,9 @@ TemporalOrderings::refine(const Ordering& new_ordering,
       IntVector::register_use(fv);
     }
 
-    std::cout<< "before adding the ordering\n";
-    dynamic_cast<TemporalOrderings*>(&orderings)->print(os);
-    std::cout << "\n";
+    //std::cout<< "before adding the ordering\n";
+    //dynamic_cast<TemporalOrderings*>(&orderings)->print(os);
+    //std::cout << "\n";
     if (new_ordering.before_id() != 0)
     {
       if (new_ordering.after_id() != Plan::GOAL_ID)
@@ -1034,6 +1034,24 @@ TemporalOrderings::refine(const Ordering& new_ordering,
   }
 }
 
+
+/*created by Lenka, slight modification of schedule*/
+float
+TemporalOrderings::getMakespan(std::map<size_t, float>& start_times,
+                std::map<size_t, float>& end_times) const {
+  float max_dist = 0.0f;
+  size_t n = distance_.size()/2;
+  for (size_t i = 1; i <= n; i++) {
+    float sd = -distance(time_node(i, StepTime::AT_START), 0)*threshold;
+    start_times.insert(std::make_pair(i, sd));
+    float ed = -distance(time_node(i, StepTime::AT_END), 0)*threshold;
+    end_times.insert(std::make_pair(i, ed));
+    if (ed > max_dist) {
+      max_dist = ed;
+    }
+  }
+  return max_dist;
+}
 
 /* Fills the given tables with distances for each step from the
    start step, and returns the greatest distance. */

@@ -378,6 +378,9 @@ struct TemporalOrderings : public Orderings {
   virtual float schedule(std::map<size_t, float>& start_times,
 			 std::map<size_t, float>& end_times) const;
 
+  float getMakespan(std::map<size_t, float>& start_times,
+             std::map<size_t, float>& end_times) const;
+
   /* Returns the makespan of this ordering collection. */
   virtual float makespan(const std::map<std::pair<size_t,
 			 StepTime::StepPoint>, float>& min_times) const;

@@ -180,7 +180,7 @@ int Vhpop_callable::getOptions(int argc, char* argv[], bool no_flaw_order, bool 
     while (1) {
       int option_index = 0;
 
-      std::cout << "options\n";
+
 
       int c = getopt_long(argc, argv, OPTION_STRING,long_options, &option_index);
 

@@ -33,7 +33,7 @@ Effect::Effect(const Literal& literal, EffectTime when)
 
     //const Literal * lit = literal;
     //if(lit != 0)
-        this->literal_ = literal.clone();
+        this->literal_ = &literal;//literal.clone();
     //else
      //   this->literal_ = 0;
 
