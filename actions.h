@@ -160,6 +160,9 @@ struct ActionSchema : public Action {
   /* Returns the parameters of this action schema. */
   const VariableList& parameters() const { return parameters_; }
 
+  /*new Lenka method, with given objects, ground to specific action*/
+ void groundToSpecific(GroundActionList& actions,
+                    const Problem& problem, std::vector<const ObjectList*> arguments) const;
   /* Fills the provided action list with all instantiations of this
      action schema. */
   void instantiations(GroundActionList& actions, const Problem& problem) const;
@@ -225,12 +228,15 @@ struct GroundAction : public Action {
 
   GroundAction(const GroundAction& s);
 
+  GroundAction(const ActionSchema& s); //to copy only the useful stuff
+
   /* Adds an argument to this ground action. */
   void add_argument(Object arg);
 
   /* Action arguments. */
   const ObjectList& arguments() const { return arguments_; }
 
+  void print(std::ostream& os) const;
   /* Prints this action on the given stream with the given bindings. */
   virtual void print(std::ostream& os,
 		     size_t step_id, const Bindings& bindings) const;

@@ -866,41 +866,46 @@ bool Bindings::unify(BindingList& mgu, const Literal& l1, size_t id1,
 
     //TODO this is not the nicest way to do,
     //try to avoid dynamic cast
-    const Atom* a1 = dynamic_cast<const Atom*>(&l1);
-    const Atom* a2 = dynamic_cast<const Atom*>(&l2);
-    if((a1 != NULL)&&(a2 != NULL)) //both atoms
+    char t1 = l1.type();
+    char t2 = l2.type();
+
+    if((t1 == 'a')&&(t2 == 'a')) //both atoms
     {
+       const Atom* a1 = dynamic_cast<const Atom*>(&l1);
+       const Atom* a2 = dynamic_cast<const Atom*>(&l2);
        Atom aa = *a1;
        Atom bb = *a2;
        if(aa==bb) //atoms comparion;
            bl = true;
        return bl;
     }
+    else if ((t1 == 'n')&&(t2 == 'n'))
+    {
+      const Negation* n1 = dynamic_cast<const Negation*>(&l1);
+      const Negation* n2 = dynamic_cast<const Negation*>(&l2);
+      Negation aa = *n1;
+      Negation bb = *n2;
+
+      if(aa==bb) //atoms comparion;
+        bl = true;
+      return bl;
+    }
+    else if (t1 != t2)
+    {
+        return false;
+    }
     else
     {
-        const Negation* n1 = dynamic_cast<const Negation*>(&l1);
-        const Negation* n2 = dynamic_cast<const Negation*>(&l2);
-        if((n1 != NULL)&&(n2 != NULL)) //both negation
-        {
-            Negation aa = *n1;
-            Negation bb = *n2;
-
-            if(n1==n2) //atoms comparion;
-                bl = true;
-            return bl;
-        }
-        else
-        {
             //TODO really test this LENKO
             std::cout << "not covered type in Bindings::unify\n";
             throw;
             //return false; //they are not same type
-        }
-
     }
 
+  }
 
-  } else if (typeid(l1) != typeid(l2)) {
+
+  else if (typeid(l1) != typeid(l2)) {
     /* Not the same type of literal. */
     return false;
   } else if (l1.predicate() != l2.predicate()) {

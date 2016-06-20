@@ -45,6 +45,11 @@ struct Object {
   /* Constructs an object. */
   explicit Object(int index) : index_(index) {}
 
+  Object(const Object& o)
+      :index_(o.index_)
+  {
+  }
+
   /* Converts this object to a term. */
   operator Term() const;
 
@@ -200,11 +205,39 @@ struct TermTable {
   /* Constructs an empty term table. */
   TermTable() : parent_(0) {}
 
+
+  /* Constructs a term table extending the given term table. */
+  //TermTable(const TermTable& parent) : parent_(&parent) {}
+
+  TermTable(const TermTable& o)
+  {
+      for(std::map<std::string, Object>::const_iterator it = o.objects_.begin(); it != o.objects_.end();it++)
+      {
+          objects_.insert(std::pair<std::string, Object>(it->first,Object(it->second)));
+      }
+
+      if(o.parent_ != 0)
+      {
+          parent_ = new TermTable(*o.parent_);
+      }
+      else
+      {
+          parent_ = NULL;
+      }
+
+      for(std::map<Type, const ObjectList*>::iterator it = o.compatible_.begin(); it != o.compatible_.end(); it++)
+      {
+          Type t = it->first;
+          ObjectList * obj = new ObjectList(*(it->second));
+          compatible_.insert(std::pair<Type,const ObjectList*>(t,obj));
+      }
+
+  }
+
   /* Deletes this term table. */
   ~TermTable();
 
-  /* Constructs a term table extending the given term table. */
-  TermTable(const TermTable& parent) : parent_(&parent) {}
+
 
   /* Adds an object with the given name and type to this term table
      and returns the object. */

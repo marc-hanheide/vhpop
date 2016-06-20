@@ -402,7 +402,7 @@ const Plan * Vhpop_callable::solve(bool bvar, const std::string probName)
 
 
 
-            std::cout << ';' << problem.name() << std::endl;
+            //std::cout << ';' << problem.name() << std::endl;
             struct itimerval timer = { { 1000000, 900000 }, { 1000000, 900000 } };
   #ifdef PROFILING
         setitimer(ITIMER_VIRTUAL, &timer, NULL);
@@ -410,11 +410,11 @@ const Plan * Vhpop_callable::solve(bool bvar, const std::string probName)
         setitimer(ITIMER_PROF, &timer, NULL);
   #endif
 
-            std::cout << verbosity << "\n";
+            //std::cout << verbosity << "\n";
             //Lenka replaced
             //plan =  Plan::plan(problem, params,!ALWAYS_DELETE_ALL && pi == Problem::end());
             plan =  Plan::plan(problem, params,bvar);
-            std::cout << "after plan\n";
+            //std::cout << "after plan\n";
             if (plan != NULL) {
                 if (plan->complete()) {
                     if (verbosity > 0) {
@@ -424,18 +424,24 @@ const Plan * Vhpop_callable::solve(bool bvar, const std::string probName)
               std::cerr << "Number of steps: " << plan->num_steps() << std::endl;
                     }
 
-                    printf("time%.10f\n", (double)(time(NULL) - start));
+                    //printf("time%.10f\n", (double)(time(NULL) - start));
 
                     //std::cout << *plan << std::endl;
 
                 }
                 else {
-                    std::cout << "no plan" << std::endl;
-                    std::cout << ";Search limit reached." << std::endl;
+                    if(verbosity>0)
+                    {
+                      std::cout << "no plan" << std::endl;
+                      std::cout << ";Search limit reached." << std::endl;
+                    }
                 }
             } else {
-                std::cout << "no plan" << std::endl;
-                std::cout << ";Problem has no solution." << std::endl;
+                if(verbosity >0)
+                {
+                  std::cout << "no plan" << std::endl;
+                  std::cout << ";Problem has no solution." << std::endl;
+                }
             }
 
 

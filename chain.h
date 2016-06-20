@@ -116,7 +116,7 @@ public:
   static void print(const Chain<T>& source) {
 
     for (const Chain<T>* ci = &source; ci != 0; ci = ci->tail) {
-      std::cout << "head " << &ci->head << ";tail " << ci->tail << "\n";
+      std::cout << "head " << &ci->head << ";tail " << &ci->tail << "\n";
     }
 
   }

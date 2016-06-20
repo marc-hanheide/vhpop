@@ -137,7 +137,7 @@ Unsafe::Unsafe(const Unsafe &o)
   MutexThreat::MutexThreat(const MutexThreat& o)
      :step_id1_(o.step_id1_), step_id2_(o.step_id2_)
   {
-      std::cout <<"in mutexthreat copy constructor\n";
+      //std::cout <<"in mutexthreat copy constructor\n";
       if(o.effect1_ != 0)
           this->effect1_ = new Effect(*o.effect1_);
       else

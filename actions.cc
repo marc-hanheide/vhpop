@@ -303,7 +303,7 @@ ActionSchema::ActionSchema(const std::string& name, bool durative)
 
 /*copy constructor*/
 ActionSchema::ActionSchema(const ActionSchema& s)
-    : Action(s){}
+    : Action(s),parameters_(s.parameters_){}
 
 /* Adds a parameter to this action schema. */
 void ActionSchema::add_parameter(Variable var) {
@@ -326,58 +326,155 @@ void ActionSchema::instantiations(GroundActionList& actions,
     SubstitutionMap args;
     std::vector<const ObjectList*> arguments(n);
     std::vector<ObjectList::const_iterator> next_arg;
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++)
+    {
       const Type& t = TermTable::type(parameters()[i]);
       arguments[i] = &problem.terms().compatible_objects(t);
-      if (arguments[i]->empty()) {
-	return;
+      if (arguments[i]->empty())
+      {
+        return;
       }
       next_arg.push_back(arguments[i]->begin());
     }
     std::stack<const Formula*> conds;
     conds.push(&condition());
     Formula::register_use(conds.top());
-    for (size_t i = 0; i < n; ) {
+    for (size_t i = 0; i < n; )
+    {
       args.insert(std::make_pair(parameters()[i], *next_arg[i]));
       SubstitutionMap pargs;
       pargs.insert(std::make_pair(parameters()[i], *next_arg[i]));
       const Formula& inst_cond = conds.top()->instantiation(pargs, problem);
       conds.push(&inst_cond);
       Formula::register_use(conds.top());
-      if (i + 1 == n || inst_cond.contradiction()) {
-	if (!inst_cond.contradiction()) {
-	  const GroundAction* inst_action =
-	    instantiation(args, problem, inst_cond);
-	  if (inst_action != NULL) {
-	    actions.push_back(inst_action);
-	  }
-	}
-	for (int j = i; j >= 0; j--) {
-	  Formula::unregister_use(conds.top());
-	  conds.pop();
-	  args.erase(parameters()[j]);
-	  next_arg[j]++;
-	  if (next_arg[j] == arguments[j]->end()) {
-	    if (j == 0) {
-	      i = n;
-	      break;
-	    } else {
-	      next_arg[j] = arguments[j]->begin();
-	    }
-	  } else {
-	    i = j;
-	    break;
-	  }
-	}
-      } else {
-	i++;
-      }
+      if (i + 1 == n || inst_cond.contradiction())
+      {
+          if (!inst_cond.contradiction())
+          {
+            const GroundAction* inst_action = instantiation(args, problem, inst_cond);
+            if (inst_action != NULL)
+            {
+               actions.push_back(inst_action);
+            }
+          }
+          for (int j = i; j >= 0; j--)
+          {
+            Formula::unregister_use(conds.top());
+            conds.pop();
+            args.erase(parameters()[j]);
+            next_arg[j]++;
+            if (next_arg[j] == arguments[j]->end())
+            {
+              if (j == 0)
+              {
+                i = n;
+                break;
+              }
+              else
+              {
+                next_arg[j] = arguments[j]->begin();
+              }
+            }
+            else
+            {
+              i = j;
+              break;
+            }
+         }
     }
-    while (!conds.empty()) {
-      Formula::unregister_use(conds.top());
-      conds.pop();
+    else
+    {
+      i++;
     }
   }
+  while (!conds.empty())
+  {
+      Formula::unregister_use(conds.top());
+      conds.pop();
+  }
+ }
+}
+
+void ActionSchema::groundToSpecific(GroundActionList& actions,
+                  const Problem& problem, std::vector<const ObjectList*> arguments) const {
+  size_t n = parameters().size();
+  if (n == 0) {
+    const GroundAction* inst_action =
+      instantiation(SubstitutionMap(), problem, condition());
+    if (inst_action != NULL) {
+      actions.push_back(inst_action);
+    }
+  } else {
+    SubstitutionMap args;
+    //std::vector<const ObjectList*> arguments(n);
+    std::vector<ObjectList::const_iterator> next_arg;
+    for (size_t i = 0; i < n; i++)
+    {
+      const Type& t = TermTable::type(parameters()[i]);
+      //arguments[i] = &problem.terms().compatible_objects(t);
+      if (arguments[i]->empty())
+      {
+        return;
+      }
+      next_arg.push_back(arguments[i]->begin());
+    }
+    std::stack<const Formula*> conds;
+    conds.push(&condition());
+    Formula::register_use(conds.top());
+    for (size_t i = 0; i < n; )
+    {
+      args.insert(std::make_pair(parameters()[i], *next_arg[i]));
+      SubstitutionMap pargs;
+      pargs.insert(std::make_pair(parameters()[i], *next_arg[i]));
+      const Formula& inst_cond = conds.top()->instantiation(pargs, problem);
+      conds.push(&inst_cond);
+      Formula::register_use(conds.top());
+      if (i + 1 == n || inst_cond.contradiction())
+      {
+          if (!inst_cond.contradiction())
+          {
+            const GroundAction* inst_action = instantiation(args, problem, inst_cond);
+            if (inst_action != NULL)
+            {
+               actions.push_back(inst_action);
+            }
+          }
+          for (int j = i; j >= 0; j--)
+          {
+            Formula::unregister_use(conds.top());
+            conds.pop();
+            args.erase(parameters()[j]);
+            next_arg[j]++;
+            if (next_arg[j] == arguments[j]->end())
+            {
+              if (j == 0)
+              {
+                i = n;
+                break;
+              }
+              else
+              {
+                next_arg[j] = arguments[j]->begin();
+              }
+            }
+            else
+            {
+              i = j;
+              break;
+            }
+         }
+    }
+    else
+    {
+      i++;
+    }
+  }
+  while (!conds.empty())
+  {
+      Formula::unregister_use(conds.top());
+      conds.pop();
+  }
+ }
 }
 
 
@@ -475,13 +572,31 @@ GroundAction::GroundAction(const std::string& name, bool durative)
 
 /*copy constructor*/
 GroundAction::GroundAction(const GroundAction &s)
-    : Action(s) {}
+    : Action(s),arguments_(s.arguments_) {}
+
+/*constructor used in the parsePlan*/
+GroundAction::GroundAction(const ActionSchema &s)
+    : Action(s),arguments_(ObjectList())
+{
+}
 
 /* Adds an argument to this ground action. */
 void GroundAction::add_argument(Object arg) {
   arguments_.push_back(arg);
+  //when creating the ground action, I need to use it as the bindings
+  //Binding(const Variable& var, size_t var_id, const Term& term, size_t term_id,bool equality)
 }
 
+
+/* Prints this action on the given stream  */
+void GroundAction::print(std::ostream& os) const {
+  os << '(' << name();
+  for (ObjectList::const_iterator ni = arguments().begin();
+       ni != arguments().end(); ni++) {
+    os << ' ' << *ni;
+  }
+  os << ')';
+}
 
 /* Prints this action on the given stream with the given bindings. */
 void GroundAction::print(std::ostream& os,

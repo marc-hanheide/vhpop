@@ -331,6 +331,9 @@ struct TemporalOrderings : public Orderings {
   virtual bool possibly_before(size_t id1, StepTime t1,
 			       size_t id2, StepTime t2) const;
 
+  bool possibly_before_inf(size_t id1, StepTime t1,
+                   size_t id2, StepTime t2) const;
+
   /* Checks if the first step could be ordered after or at the same
      time as the second step. */
   virtual bool possibly_not_before(size_t id1, StepTime t1,
@@ -339,6 +342,9 @@ struct TemporalOrderings : public Orderings {
   /* Checks if the first step could be ordered after the second step. */
   virtual bool possibly_after(size_t id1, StepTime t1,
 			      size_t id2, StepTime t2) const;
+
+  bool possibly_after_inf(size_t id1, StepTime t1,
+                  size_t id2, StepTime t2) const;
 
   /* Checks if the first step could be ordered before or at the same
      time as the second step. */

@@ -22,12 +22,14 @@ Link::Link(size_t from_id, StepTime effect_time,
     being_merged = false;
     being_threaten = false;
     type_ = "";
+    task_id_ = -1;
   Formula::register_use(condition_);
 }
 
 Link::Link(size_t from_id, StepTime effect_time, size_t to_id, const Literal * lit, FormulaTime cond_time, bool being_threat, std::string type)
   :from_id_(from_id), effect_time_(effect_time), to_id_(to_id), condition_time_(cond_time),being_threaten(being_threat)
 {
+    task_id_ = -1; //TODO  check where this method is called
     type_ = type;
     condition_ = lit; //just reassigning the pointer, because lit is already copied whenever this is called
 }
@@ -40,6 +42,7 @@ Link::Link(const Link& l)
     being_merged = l.being_merged;
     being_threaten =  l.being_threaten;
     type_ = l.type_;
+    task_id_ = l.task_id_;
 
   if (l.condition_ !=0)
   {
@@ -48,6 +51,25 @@ Link::Link(const Link& l)
   }
   else
       this->condition_ = 0;
+
+}
+
+Link::Link(const Link& l, size_t task_id)
+    : from_id_(l.from_id_), effect_time_(l.effect_time_), to_id_(l.to_id_),
+    condition_time_(l.condition_time_) {
+    being_merged = l.being_merged;
+    being_threaten =  l.being_threaten;
+    type_ = l.type_;
+    task_id_ = task_id;
+
+  if (l.condition_ !=0)
+  {
+     this->condition_ = l.condition_->clone();
+     Formula::register_use(condition_);
+  }
+  else
+      this->condition_ = 0;
+
 
 }
 

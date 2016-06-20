@@ -610,6 +610,41 @@ TemporalOrderings::~TemporalOrderings() {
   RCObject::destructive_deref(goal_achievers_);
 }
 
+/*this method added by Lenka, because modifying existing method was causing some weird bug*/
+bool TemporalOrderings::possibly_before_inf(size_t id1, StepTime t1,
+         size_t id2, StepTime t2) const
+{
+    if (id1 == id2 && t1 >= t2) {
+        return false;
+      } else if (id1 == 0 || id2 == Plan::GOAL_ID) {
+        return true;
+      } else if (id1 == Plan::GOAL_ID || id2 == 0) {
+        return false;
+      } else {
+        int dist = distance(time_node(id1, t1), time_node(id2, t2));
+        if(dist == INT_MAX)
+            return false;
+        else
+            return dist > 0 || (dist == 0 && t1.rel < t2.rel);
+      }
+}
+
+bool TemporalOrderings::possibly_after_inf(size_t id1, StepTime t1,
+                       size_t id2, StepTime t2) const {
+  if (id1 == id2 && t1 <= t2) {
+    return false;
+  } else if (id1 == 0 || id2 == Plan::GOAL_ID) {
+    return false;
+  } else if (id1 == Plan::GOAL_ID || id2 == 0) {
+    return true;
+  } else {
+    int dist = distance(time_node(id2, t2), time_node(id1, t1));
+    if (dist == INT_MAX)
+        return false;
+    else
+        return dist > 0 || (dist == 0 && t2.rel < t1.rel);
+  }
+}
 
 /* Checks if the first step could be ordered before the second step. */
 bool TemporalOrderings::possibly_before(size_t id1, StepTime t1,
