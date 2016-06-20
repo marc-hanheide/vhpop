@@ -117,7 +117,8 @@ formulas.o: formulas.cc formulas.h config.h predicates.h types.h \
  functions.h expressions.h debug.h /usr/include/c++/4.6/stack \
  /usr/include/c++/4.6/deque /usr/include/c++/4.6/bits/stl_deque.h \
  /usr/include/c++/4.6/bits/deque.tcc \
- /usr/include/c++/4.6/bits/stl_stack.h
+ /usr/include/c++/4.6/bits/stl_stack.h /usr/include/c++/4.6/sstream \
+ /usr/include/c++/4.6/bits/sstream.tcc
 
 formulas.h:
 
@@ -458,3 +459,7 @@ debug.h:
 /usr/include/c++/4.6/bits/deque.tcc:
 
 /usr/include/c++/4.6/bits/stl_stack.h:
+
+/usr/include/c++/4.6/sstream:
+
+/usr/include/c++/4.6/bits/sstream.tcc:

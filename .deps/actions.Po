@@ -117,7 +117,16 @@ actions.o: actions.cc actions.h config.h effects.h terms.h types.h \
  expressions.h /usr/include/c++/4.6/limits /usr/include/c++/4.6/stack \
  /usr/include/c++/4.6/deque /usr/include/c++/4.6/bits/stl_deque.h \
  /usr/include/c++/4.6/bits/deque.tcc \
- /usr/include/c++/4.6/bits/stl_stack.h /usr/include/c++/4.6/typeinfo
+ /usr/include/c++/4.6/bits/stl_stack.h /usr/include/c++/4.6/typeinfo \
+ /usr/include/c++/4.6/memory /usr/include/c++/4.6/bits/stl_tempbuf.h \
+ /usr/include/c++/4.6/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/4.6/ext/concurrence.h /usr/include/c++/4.6/functional \
+ /usr/include/c++/4.6/tuple /usr/include/c++/4.6/utility \
+ /usr/include/c++/4.6/bits/stl_relops.h \
+ /usr/include/c++/4.6/backward/auto_ptr.h \
+ /usr/include/c++/4.6/bits/unique_ptr.h \
+ /usr/include/c++/4.6/bits/shared_ptr.h \
+ /usr/include/c++/4.6/bits/shared_ptr_base.h
 
 actions.h:
 
@@ -460,3 +469,27 @@ expressions.h:
 /usr/include/c++/4.6/bits/stl_stack.h:
 
 /usr/include/c++/4.6/typeinfo:
+
+/usr/include/c++/4.6/memory:
+
+/usr/include/c++/4.6/bits/stl_tempbuf.h:
+
+/usr/include/c++/4.6/bits/stl_raw_storage_iter.h:
+
+/usr/include/c++/4.6/ext/concurrence.h:
+
+/usr/include/c++/4.6/functional:
+
+/usr/include/c++/4.6/tuple:
+
+/usr/include/c++/4.6/utility:
+
+/usr/include/c++/4.6/bits/stl_relops.h:
+
+/usr/include/c++/4.6/backward/auto_ptr.h:
+
+/usr/include/c++/4.6/bits/unique_ptr.h:
+
+/usr/include/c++/4.6/bits/shared_ptr.h:
+
+/usr/include/c++/4.6/bits/shared_ptr_base.h:

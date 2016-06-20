@@ -137,7 +137,13 @@ plans.o: plans.cc plans.h config.h chain.h refcount.h \
  /usr/include/c++/4.6/bits/stl_deque.h \
  /usr/include/c++/4.6/bits/deque.tcc \
  /usr/include/c++/4.6/bits/stl_queue.h \
- /usr/include/x86_64-linux-gnu/sys/time.h
+ /usr/include/x86_64-linux-gnu/sys/time.h /usr/include/c++/4.6/memory \
+ /usr/include/c++/4.6/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/4.6/ext/concurrence.h \
+ /usr/include/c++/4.6/backward/auto_ptr.h \
+ /usr/include/c++/4.6/bits/unique_ptr.h \
+ /usr/include/c++/4.6/bits/shared_ptr.h \
+ /usr/include/c++/4.6/bits/shared_ptr_base.h
 
 plans.h:
 
@@ -546,3 +552,17 @@ debug.h:
 /usr/include/c++/4.6/bits/stl_queue.h:
 
 /usr/include/x86_64-linux-gnu/sys/time.h:
+
+/usr/include/c++/4.6/memory:
+
+/usr/include/c++/4.6/bits/stl_raw_storage_iter.h:
+
+/usr/include/c++/4.6/ext/concurrence.h:
+
+/usr/include/c++/4.6/backward/auto_ptr.h:
+
+/usr/include/c++/4.6/bits/unique_ptr.h:
+
+/usr/include/c++/4.6/bits/shared_ptr.h:
+
+/usr/include/c++/4.6/bits/shared_ptr_base.h:
