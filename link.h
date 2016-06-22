@@ -68,9 +68,18 @@ struct Link {
       return type_;
   }
 
-  size_t getTaskId() const
+  int getTaskId() const
   {
       return task_id_;
+  }
+  void setConditionStr(std::string str) const
+  {
+      condition_str_ = str;
+  }
+
+  std::string getConditionStr()
+  {
+      return condition_str_;
   }
 
 private:
@@ -83,11 +92,12 @@ private:
   /* Condition satisfied by link. */
   const Literal* condition_;
   /* Time of condition satisfied by link. */
-  size_t task_id_;
+  int task_id_;
   FormulaTime condition_time_;
   mutable bool being_merged;
   mutable bool being_threaten;
   mutable std::string type_;
+  mutable std::string condition_str_;
 };
 
 

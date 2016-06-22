@@ -612,7 +612,9 @@ bool operator== (Negation &l1, Negation &l2)
 {
    bool b = false;
    //TODO is it allright to skip negations?
-   if(l1.atom_ == l2.atom_)
+   Atom a1 = *l1.atom_;
+   Atom a2 = *l2.atom_;
+   if(a1 == a2)
        b = true;
 
    return b;

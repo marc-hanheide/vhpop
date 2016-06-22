@@ -66,25 +66,25 @@ bool operator== (Step &s1, Step &s2)
     if(s1.id_ != s2.id_)
         return false;
 
-    std::unique_ptr<const ActionSchema> a1 (dynamic_cast<const ActionSchema*>(s1.action_->clone()));
-    std::unique_ptr<const ActionSchema> a2 (dynamic_cast<const ActionSchema*>(s2.action_->clone()));
+    std::unique_ptr<const GroundAction> ag1 (dynamic_cast<const GroundAction*>(s1.action_->clone()));
+    std::unique_ptr<const GroundAction> ag2 (dynamic_cast<const GroundAction*>(s2.action_->clone()));
 
-    if((a1.get()!=NULL)&&(a2.get()!=NULL))
+    if((ag1.get()!=NULL)&&(ag2.get()!=NULL))
     {
-      ActionSchema as1 = *a1;
-      ActionSchema as2 = *a2;
+      GroundAction as1 = *ag1;
+      GroundAction as2 = *ag2;
       if(!(as1 == as2))
           return false;
     }
     else
     {
-        std::unique_ptr<const GroundAction> ag1 (dynamic_cast<const GroundAction*>(s1.action_->clone()));
-        std::unique_ptr<const GroundAction> ag2 (dynamic_cast<const GroundAction*>(s2.action_->clone()));
+        std::unique_ptr<const ActionSchema> a1 (dynamic_cast<const ActionSchema*>(s1.action_->clone()));
+        std::unique_ptr<const ActionSchema> a2 (dynamic_cast<const ActionSchema*>(s2.action_->clone()));
 
-        if((ag1.get()!=NULL)&&(ag2.get()!=NULL))
+        if((a1.get()!=NULL)&&(a2.get()!=NULL))
         {
-          GroundAction as1 = *ag1;
-          GroundAction as2 = *ag2;
+          ActionSchema as1 = *a1;
+          ActionSchema as2 = *a2;
           if(!(as1 == as2))
               return false;
         }
