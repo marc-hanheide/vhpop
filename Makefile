@@ -76,7 +76,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = vhpop_callable_main$(EXEEXT)
+bin_PROGRAMS = vhpop$(EXEEXT)
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -96,17 +96,16 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_vhpop_callable_main_OBJECTS = vhpop_callable_main.$(OBJEXT) \
-	refcount.$(OBJEXT) types.$(OBJEXT) terms.$(OBJEXT) \
-	predicates.$(OBJEXT) functions.$(OBJEXT) expressions.$(OBJEXT) \
-	formulas.$(OBJEXT) effects.$(OBJEXT) actions.$(OBJEXT) \
-	domains.$(OBJEXT) problems.$(OBJEXT) bindings.$(OBJEXT) \
-	orderings.$(OBJEXT) flaws.$(OBJEXT) heuristics.$(OBJEXT) \
-	plans.$(OBJEXT) parameters.$(OBJEXT) requirements.$(OBJEXT) \
-	pddl.$(OBJEXT) tokens.$(OBJEXT) link.$(OBJEXT) \
-	vhpop_callable.$(OBJEXT)
-vhpop_callable_main_OBJECTS = $(am_vhpop_callable_main_OBJECTS)
-vhpop_callable_main_DEPENDENCIES = 
+am_vhpop_OBJECTS = vhpop.$(OBJEXT) refcount.$(OBJEXT) types.$(OBJEXT) \
+	terms.$(OBJEXT) predicates.$(OBJEXT) functions.$(OBJEXT) \
+	expressions.$(OBJEXT) formulas.$(OBJEXT) effects.$(OBJEXT) \
+	actions.$(OBJEXT) domains.$(OBJEXT) problems.$(OBJEXT) \
+	bindings.$(OBJEXT) orderings.$(OBJEXT) flaws.$(OBJEXT) \
+	heuristics.$(OBJEXT) plans.$(OBJEXT) parameters.$(OBJEXT) \
+	requirements.$(OBJEXT) pddl.$(OBJEXT) tokens.$(OBJEXT) \
+	link.$(OBJEXT)
+vhpop_OBJECTS = $(am_vhpop_OBJECTS)
+vhpop_DEPENDENCIES = 
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -161,8 +160,8 @@ AM_V_YACC = $(am__v_YACC_$(V))
 am__v_YACC_ = $(am__v_YACC_$(AM_DEFAULT_VERBOSITY))
 am__v_YACC_0 = @echo "  YACC    " $@;
 am__v_YACC_1 = 
-SOURCES = $(vhpop_callable_main_SOURCES)
-DIST_SOURCES = $(vhpop_callable_main_SOURCES)
+SOURCES = $(vhpop_SOURCES)
+DIST_SOURCES = $(vhpop_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -219,7 +218,7 @@ CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPPFLAGS = 
-CXX = g++
+CXX = g++ 
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2 -std=c++0x
@@ -304,8 +303,8 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-vhpop_callable_main_SOURCES = vhpop_callable_main.cc refcount.cc refcount.h chain.h types.cc types.h terms.cc terms.h predicates.cc predicates.h functions.cc functions.h expressions.cc expressions.h formulas.cc formulas.h effects.cc effects.h actions.cc actions.h domains.cc domains.h problems.cc problems.h bindings.cc bindings.h orderings.cc orderings.h flaws.cc flaws.h heuristics.cc heuristics.h plans.cc plans.h parameters.cc parameters.h requirements.cc requirements.h pddl.yy tokens.ll debug.h link.cc link.h vhpop_callable.cc vhpop_callable.h
-vhpop_callable_main_LDADD = 
+vhpop_SOURCES = vhpop.cc refcount.cc refcount.h chain.h types.cc types.h terms.cc terms.h predicates.cc predicates.h functions.cc functions.h expressions.cc expressions.h formulas.cc formulas.h effects.cc effects.h actions.cc actions.h domains.cc domains.h problems.cc problems.h bindings.cc bindings.h orderings.cc orderings.h flaws.cc flaws.h heuristics.cc heuristics.h plans.cc plans.h parameters.cc parameters.h requirements.cc requirements.h pddl.yy tokens.ll debug.h link.cc link.h
+vhpop_LDADD = 
 MAINTAINERCLEANFILES = pddl.cc tokens.cc
 EXTRA_DIST = getopt.c getopt1.c getopt.h ipc3-vhpop examples scripts
 AM_YFLAGS = -d
@@ -409,9 +408,9 @@ pddl.hh: pddl.cc
 	@if test ! -f $@; then rm -f pddl.cc; else :; fi
 	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) pddl.cc; else :; fi
 
-vhpop_callable_main$(EXEEXT): $(vhpop_callable_main_OBJECTS) $(vhpop_callable_main_DEPENDENCIES) $(EXTRA_vhpop_callable_main_DEPENDENCIES) 
-	@rm -f vhpop_callable_main$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(vhpop_callable_main_OBJECTS) $(vhpop_callable_main_LDADD) $(LIBS)
+vhpop$(EXEEXT): $(vhpop_OBJECTS) $(vhpop_DEPENDENCIES) $(EXTRA_vhpop_DEPENDENCIES) 
+	@rm -f vhpop$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(vhpop_OBJECTS) $(vhpop_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -442,8 +441,7 @@ include ./$(DEPDIR)/requirements.Po
 include ./$(DEPDIR)/terms.Po
 include ./$(DEPDIR)/tokens.Po
 include ./$(DEPDIR)/types.Po
-include ./$(DEPDIR)/vhpop_callable.Po
-include ./$(DEPDIR)/vhpop_callable_main.Po
+include ./$(DEPDIR)/vhpop.Po
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

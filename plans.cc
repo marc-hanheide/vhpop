@@ -690,7 +690,8 @@ const Plan* Plan::plan(const Problem& problem, const Parameters& p,
       getitimer(ITIMER_PROF, &timer);
 #endif
       double t = 1000000.9- (timer.it_value.tv_sec + timer.it_value.tv_usec*1e-6);
-      if (t >= 60.0*params->time_limit)
+      //if (t >= 60.0*params->time_limit) //lenka changed here in order to have limit in sec
+      if(t >= params->time_limit)
       {
          /* Time limit exceeded. */
          break;
